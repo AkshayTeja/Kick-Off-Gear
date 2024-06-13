@@ -83,7 +83,7 @@ const ProductCard: React.FC<propsType> = ({img,title,desc,rating,price}) => {
             <div>{generateRating(rating)}</div>
 
             <div className='font-bold flex gap-4'>
-                {price}
+                ${price}
                 <del className='text-gray-500 font-normal'>${parseInt(price)+20}.00</del>
             </div>
         </div>
