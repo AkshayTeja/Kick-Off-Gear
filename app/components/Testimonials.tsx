@@ -10,13 +10,13 @@ const Testimonials = () => {
         <div className='border border-gray-300 rounded-2xl grid place-items-center p-6 lg:p-0'>
           <div className='text-center flex flex-col items-center gap-1'>
             
-            <Image className='rounded-full inline-block' src='' width={80} height={80} alt='dp'/>
+            <Image className='rounded-full inline-block' src='/Profile Picture.png' width={80} height={80} alt='dp'/>
             
             <h2 className='text-gray-500 font-black text-[20px]'>Fernandes B.</h2>
            
             <p>Football Fan, India</p>
             
-            <Image className='inline-block py-2' src='' width={30} height={30} alt='quotes'/>
+            <Image className='inline-block py-2' src='/Quotes.png' width={50} height={50} alt='quotes'/>
             
             <p className='max-w-[200px] text-gray-500'>
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores delectus commodi, explicabo veritatis, unde dolor nisi illum quasi accusamus placeat obcaecati nobis ea illo molestias quae architecto aliquam nemo provident.
@@ -26,7 +26,7 @@ const Testimonials = () => {
           </div>
         </div>
 
-        <div className='bg-red-600 bg-[url(/) bg-cover h-[500px] rounded-2xl grid place-items-center'>
+        <div className="bg-[url('/Stadium.jpg')] bg-cover h-[500px] rounded-2xl grid place-items-center">
           <div className='bg-[#ffffffab] min-w-[270px] sm:min-w-[300px] md:min-w-[500px] rounded-xl py-8 sm:px-8 px-2 grid place-items-center gap-3'>
 
             <button className='bg-blackish text-white p-2 rounded-md'>

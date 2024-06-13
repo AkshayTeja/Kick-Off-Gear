@@ -36,6 +36,13 @@ const Hero = () => {
             mainTitle: "SUPPORT YOUR CLUB!",
             price: "$50.00",
         },
+        {
+            id: 3,
+            img: "/Boots.jpg",
+            title: "QUALITY SHOES",
+            mainTitle: "GEAR UP!",
+            price: "$30.00",
+        },
     ];
 
     return (
