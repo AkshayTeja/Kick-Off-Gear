@@ -1,10 +1,18 @@
 "use client";
 
-import React from 'react';
+import React,{ useEffect, useState } from 'react';
 import Slider from "react-slick";
 import Slide from './Slide';
 
 const Hero = () => {
+
+    const [reRender, setReRender] = useState(false);
+
+    useEffect(() => {
+        // Force a re-render once the component mounts to ensure layout adjusts
+        setReRender(true);
+    }, []);
+
     var settings = {
         dots: true,
         infinite: true,
@@ -12,6 +20,7 @@ const Hero = () => {
         slidesToScroll: 1,
         autoplay: true,
         pauseOnHover: false,
+        adaptiveHeight: true,
     };
 
     const slideData = [
