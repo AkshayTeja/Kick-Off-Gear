@@ -1,5 +1,4 @@
 # ⚽KICK OFF GEAR
-
 Just An Online Football Store Made Using <br><br>
 <img src="https://skillicons.dev/icons?i=nextjs,tailwind" style="margin: 20px;"/>
 
