@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import HeaderTop from "@/app/components/HeaderTop";
-import HeaderMain from "./components/HeaderMain";
-import Navbar from "./components/Navbar";
-import MobNavbar from "./components/MobNavbar";
-import Footer from "./components/Footer";
-
-
+import LayoutClient from "./LayoutClient";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { CartProvider } from "./context/CartContext";
+import Footer from "./components/Footer"; // Import your Footer component
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,18 +17,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <HeaderTop/>
-        <HeaderMain/>
-        <Navbar/>
-        <MobNavbar/>
-        {children}
-        <Footer/>
+      <body className={`${inter.className} flex flex-col min-h-screen`}>
+        <CartProvider>
+          <LayoutClient>
+            <div className="flex-grow">
+              {children}
+            </div>
+          </LayoutClient>
+        </CartProvider>
       </body>
     </html>
   );
