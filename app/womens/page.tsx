@@ -1,58 +1,96 @@
-// app/womens/page.tsx
 "use client";
-import React, { useState } from "react";
+import React from "react";
+import ProductCard from "../components/ProductCard";
 
-const categories = ["All", "Football Jerseys", "Training Kits", "Running Shoes", "Winter Gear", "Accessories"];
-
-const products = [
-  { id: 1, name: "Women's Football Jersey", category: "Football Jerseys" },
-  { id: 2, name: "Women's Training Kit", category: "Training Kits" },
-  { id: 3, name: "Women's Running Shoes", category: "Running Shoes" },
-  { id: 4, name: "Winter Jacket - Women", category: "Winter Gear" },
-  { id: 5, name: "Headband", category: "Accessories" },
+const productsData = [
+  {
+    img: "/England.webp",
+    title: "England Euro 24",
+    desc: "Home Kit",
+    rating: 5,
+    price: "50.00",
+  },
+  {
+    img: "/France.jpg",
+    title: "France Euro 24",
+    desc: "Home Kit",
+    rating: 4,
+    price: "50.00",
+  },
+  {
+    img: "/Belgium.webp",
+    title: "Belgium Euro 24",
+    desc: "Home Kit",
+    rating: 5,
+    price: "50.00",
+  },
+  {
+    img: "/Portugal.webp",
+    title: "Portugal Euro 24",
+    desc: "Home Kit",
+    rating: 4,
+    price: "50.00",
+  },
+  {
+    img: "/Germany.webp",
+    title: "Germany Euro 24",
+    desc: "Home Kit",
+    rating: 5,
+    price: "50.00",
+  },
+  {
+    img: "/Germany Retro.webp",
+    title: "Germany 1996 Retro ",
+    desc: "Home Kit",
+    rating: 5,
+    price: "50.00",
+  },
+  {
+    img: "/Predator.avif",
+    title: "Adidas Predator Boots",
+    desc: "Home Kit",
+    rating: 5,
+    price: "30.00",
+  },
+  {
+    img: "/Grey Adidas.avif",
+    title: "Adidas Strung Boots",
+    desc: "Home Kit",
+    rating: 4,
+    price: "30.00",
+  },
 ];
 
-const WomensPage = () => {
-  const [selectedCategory, setSelectedCategory] = useState("All");
-
-  const filteredProducts =
-    selectedCategory === "All"
-      ? products
-      : products.filter((product) => product.category === selectedCategory);
-
+const MensPage = () => {
   return (
     <div className="container mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">Women's Collection</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center text-blackish">Women's</h1>
 
-      {/* Filter Dropdown */}
-      <div className="mb-6 max-w-xs mx-auto">
-        <select
-          className="w-full px-4 py-2 border border-gray-300 rounded-md"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
+      {/* Engaging Introduction Text */}
+      <div className="max-w-3xl mx-auto text-center mb-4">
+        <p className="text-xl text-gray-800 leading-relaxed">
+          Explore our extensive collection of women's football jerseys, each piece designed with authenticity and passion. From iconic national teams to legendary club sides, we've got the perfect jersey to show your support. Find your perfect fit and wear it with pride.
+        </p>
       </div>
 
-      {/* Product List */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts.map((product) => (
-          <div
-            key={product.id}
-            className="border p-4 rounded-md shadow hover:shadow-lg transition"
-          >
-            <h2 className="text-xl font-semibold">{product.name}</h2>
-            <p className="text-gray-600 mt-1">{product.category}</p>
+      <div>
+        <div className="container pt-10">
+
+          <div className="grid grid-cols-1 place-items-center sm:place-items-start sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 xl:gap-x-20 xl:gap-y-10">
+            {productsData.map((item, index) => (
+              <ProductCard
+                key={index}
+                img={item.img}
+                title={item.title}
+                desc={item.desc}
+                rating={item.rating}
+                price={item.price} id={0}              />
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );
 };
 
-export default WomensPage;
+export default MensPage;

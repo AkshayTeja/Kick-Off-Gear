@@ -136,8 +136,8 @@ const Navbar = () => {
 
           <Link className="navbar__link relative" href="/mens">MEN&apos;S</Link>
           <Link className="navbar__link relative" href="/womens">WOMEN&apos;S</Link>
-          <Link className="navbar__link relative" href="#">RETRO</Link>
-          <Link className="navbar__link relative" href="#">CLUBS</Link>
+          <Link className="navbar__link relative" href="/retro">RETRO</Link>
+          <Link className="navbar__link relative" href="/clubs">CLUBS</Link>
           <Link className="navbar__link relative" href="#">HOT OFFERS</Link>
         </div>
       </div>

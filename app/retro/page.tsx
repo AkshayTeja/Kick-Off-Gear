@@ -64,12 +64,12 @@ const productsData = [
 const MensPage = () => {
   return (
     <div className="container mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-center text-blackish">Men's</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center text-blackish">Retro's</h1>
 
       {/* Engaging Introduction Text */}
       <div className="max-w-3xl mx-auto text-center mb-4">
         <p className="text-xl text-gray-800 leading-relaxed">
-          Explore our extensive collection of men's football jerseys, each piece designed with authenticity and passion. From iconic national teams to legendary club sides, we've got the perfect jersey to show your support. Find your perfect fit and wear it with pride.
+          Explore our extensive collection of retro football jerseys, each piece designed with authenticity and passion. From iconic national teams to legendary club sides, we've got the perfect jersey to show your support. Find your perfect fit and wear it with pride.
         </p>
       </div>
 
@@ -79,12 +79,12 @@ const MensPage = () => {
           <div className="grid grid-cols-1 place-items-center sm:place-items-start sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 xl:gap-x-20 xl:gap-y-10">
             {productsData.map((item, index) => (
               <ProductCard
-                key={index}
-                img={item.img}
-                title={item.title}
-                desc={item.desc}
-                rating={item.rating}
-                price={item.price} id={0}              />
+                    key={index}
+                    img={item.img}
+                    title={item.title}
+                    desc={item.desc}
+                    rating={item.rating}
+                    price={item.price} id={0}              />
             ))}
           </div>
         </div>
