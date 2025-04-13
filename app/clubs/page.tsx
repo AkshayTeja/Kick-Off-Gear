@@ -69,7 +69,7 @@ const MensPage = () => {
       {/* Engaging Introduction Text */}
       <div className="max-w-3xl mx-auto text-center mb-4">
         <p className="text-xl text-gray-800 leading-relaxed">
-          Explore our extensive collection of club football jerseys, each piece designed with authenticity and passion. From iconic national teams to legendary club sides, we've got the perfect jersey to show your support. Find your perfect fit and wear it with pride.
+        Explore our extensive collection of club football jerseys, each piece designed with authenticity and passion. From iconic national teams to legendary club sides, we&apos;sve got the perfect jersey to show your support. Find your perfect fit and wear it with pride.
         </p>
       </div>
 
