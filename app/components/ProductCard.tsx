@@ -1,8 +1,8 @@
 "use client";
-import Image from 'next/image';
-import React, { useState } from 'react';
-import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
-import { useCart } from '../context/CartContext';  // Import CartContext
+import Image from "next/image";
+import React, { useState } from "react";
+import { AiFillStar, AiOutlineStar } from "react-icons/ai";
+import { useCart } from "../context/CartContext";
 
 interface propsType {
   img: string;
@@ -10,68 +10,33 @@ interface propsType {
   desc: string;
   rating: number;
   price: string;
-  id: number; // Add a unique ID for each product
+  id: number;
 }
 
-const ProductCard: React.FC<propsType> = ({ img, title, desc, rating, price, id }) => {
+const ProductCard: React.FC<propsType> = ({
+  img,
+  title,
+  desc,
+  rating,
+  price,
+  id,
+}) => {
   const [addedToCart, setAddedToCart] = useState(false);
-  const { addToCart, removeFromCart } = useCart(); // Use the cart context
+  const { addToCart, removeFromCart } = useCart();
 
   const generateRating = (rating: number) => {
-    switch (rating) {
-      case 1:
-        return (
-          <div className='flex gap-1 text-[20px] text-accent'>
-            <AiFillStar />
-            <AiOutlineStar />
-            <AiOutlineStar />
-            <AiOutlineStar />
-            <AiOutlineStar />
-          </div>
-        );
-      case 2:
-        return (
-          <div className='flex gap-1 text-[20px] text-accent'>
-            <AiFillStar />
-            <AiFillStar />
-            <AiOutlineStar />
-            <AiOutlineStar />
-            <AiOutlineStar />
-          </div>
-        );
-      case 3:
-        return (
-          <div className='flex gap-1 text-[20px] text-accent'>
-            <AiFillStar />
-            <AiFillStar />
-            <AiFillStar />
-            <AiOutlineStar />
-            <AiOutlineStar />
-          </div>
-        );
-      case 4:
-        return (
-          <div className='flex gap-1 text-[20px] text-accent'>
-            <AiFillStar />
-            <AiFillStar />
-            <AiFillStar />
-            <AiFillStar />
-            <AiOutlineStar />
-          </div>
-        );
-      case 5:
-        return (
-          <div className='flex gap-1 text-[20px] text-accent'>
-            <AiFillStar />
-            <AiFillStar />
-            <AiFillStar />
-            <AiFillStar />
-            <AiFillStar />
-          </div>
-        );
-      default:
-        return null;
-    }
+    const stars = Array(5)
+      .fill(0)
+      .map((_, index) =>
+        index < rating ? (
+          <AiFillStar key={index} />
+        ) : (
+          <AiOutlineStar key={index} />
+        )
+      );
+    return (
+      <div className="flex gap-1 text-[18px] text-yellow-400">{stars}</div>
+    );
   };
 
   const handleToggleCart = () => {
@@ -84,29 +49,39 @@ const ProductCard: React.FC<propsType> = ({ img, title, desc, rating, price, id 
   };
 
   return (
-    <div className='px-4 border border-blackish rounded-xl max-w-[400px]'>
-      <div>
-        <Image className='w-full h-auto pt-3' src={img} width={200} height={300} alt={title} />
+    <div className="relative bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 max-w-[300px] w-full mx-auto overflow-hidden group">
+      <div className="relative overflow-hidden">
+        <Image
+          className="w-full h-[200px] object-cover transition-transform duration-300 group-hover:scale-105"
+          src={img}
+          width={300}
+          height={200}
+          alt={title}
+        />
+        <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </div>
 
-      <div className='space-y-2 py-2'>
-        <h2 className='text-blackish font-medium uppercase'>{title}</h2>
-
-        <p className='text-gray-600 max-w-[150px]'>{desc}</p>
-
+      <div className="p-4 space-y-3">
+        <h2 className="text-lg font-semibold text-gray-800 line-clamp-1">
+          {title}
+        </h2>
+        <p className="text-sm text-gray-500 line-clamp-2">{desc}</p>
         <div>{generateRating(rating)}</div>
-
-        <div className='font-bold flex gap-4'>
-          ${price}
-          <del className='text-gray-500 font-normal'>${parseInt(price) + 20}.00</del>
+        <div className="flex items-center gap-3">
+          <span className="text-lg font-bold text-gray-900">${price}</span>
+          <del className="text-sm text-gray-400">
+            ${(parseFloat(price) + 20).toFixed(2)}
+          </del>
         </div>
-
-        {/* Add to Cart/Remove from Cart Button */}
         <button
           onClick={handleToggleCart}
-          className={`mt-4 w-full py-2 px-4 rounded-md text-black ${addedToCart ? 'bg-gray-500' : 'bg-accent hover:bg-accent-dark'} transition duration-200`}
+          className={`w-full py-2 px-4 rounded-lg font-medium text-white transition-all duration-200 transform hover:scale-105 ${
+            addedToCart
+              ? "bg-red-500 hover:bg-red-600"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
         >
-          {addedToCart ? 'Remove from Cart' : 'Add to Cart'}
+          {addedToCart ? "Remove from Cart" : "Add to Cart"}
         </button>
       </div>
     </div>
