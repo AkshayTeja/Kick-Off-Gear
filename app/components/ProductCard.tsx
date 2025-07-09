@@ -1,8 +1,11 @@
 "use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import React, { useState } from "react";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { useCart } from "../context/CartContext";
+import supabase from "../supabaseClient";
+import type { User } from "@supabase/supabase-js";
 
 interface propsType {
   img: string;
@@ -10,7 +13,7 @@ interface propsType {
   desc: string;
   rating: number;
   price: string;
-  id: number;
+  id: string; // Changed from number to string (UUID)
 }
 
 const ProductCard: React.FC<propsType> = ({
@@ -22,7 +25,78 @@ const ProductCard: React.FC<propsType> = ({
   id,
 }) => {
   const [addedToCart, setAddedToCart] = useState(false);
-  const { addToCart, removeFromCart } = useCart();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch user
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
+        if (userError) throw userError;
+        setUser(user);
+
+        if (!user) {
+          setLoading(false);
+          return;
+        }
+
+        // Check if item is in cart
+        const { data, error } = await supabase
+          .from("cart")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("item_id", id);
+        if (error) throw error;
+        setAddedToCart(data.length > 0);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id, router]);
+
+  const handleToggleCart = async () => {
+    if (!user) {
+      router.push("/auth");
+      return;
+    }
+
+    try {
+      if (addedToCart) {
+        // Remove from cart
+        const { error } = await supabase
+          .from("cart")
+          .delete()
+          .eq("item_id", id)
+          .eq("user_id", user.id);
+        if (error) throw error;
+        setAddedToCart(false);
+      } else {
+        // Add to cart
+        const { error } = await supabase.from("cart").insert({
+          user_id: user.id,
+          item_id: id,
+          item_name: title,
+          item_description: desc,
+          item_price: parseFloat(price),
+          quantity: 1,
+        });
+        if (error) throw error;
+        setAddedToCart(true);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
 
   const generateRating = (rating: number) => {
     const stars = Array(5)
@@ -39,14 +113,13 @@ const ProductCard: React.FC<propsType> = ({
     );
   };
 
-  const handleToggleCart = () => {
-    if (addedToCart) {
-      removeFromCart(id);
-    } else {
-      addToCart({ id, img, title, desc, rating, price });
-    }
-    setAddedToCart((prev) => !prev);
-  };
+  if (loading) {
+    return <div className="text-center text-gray-600">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-red-500">{error}</div>;
+  }
 
   return (
     <div className="relative bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 max-w-[300px] w-full mx-auto overflow-hidden group">

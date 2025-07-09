@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BiUser } from "react-icons/bi";
 import { BsSearch } from "react-icons/bs";
 import { FiHeart } from "react-icons/fi";
@@ -7,9 +7,42 @@ import { HiOutlineShoppingBag } from "react-icons/hi";
 import { IoFootballSharp } from "react-icons/io5";
 import Link from "next/link";
 import { useCart } from "../context/CartContext";
+import supabase from "../supabaseClient";
 
 const HeaderMain = () => {
-  const { cartItems } = useCart(); // 👈 Get cart items
+  const { cartItems } = useCart();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Check current session
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+
+    // Listen for auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    // Cleanup subscription on component unmount
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleProfileClick = () => {
+    if (user) {
+      window.location.href = "/profile";
+    } else {
+      window.location.href = "/auth";
+    }
+  };
 
   return (
     <div className="border-b border-gray-200 py-6">
@@ -36,7 +69,9 @@ const HeaderMain = () => {
         </div>
 
         <div className="hidden lg:flex gap-4 text-gray-500 text-[30px]">
-          <BiUser />
+          <button onClick={handleProfileClick}>
+            <BiUser />
+          </button>
 
           <div className="relative">
             <FiHeart />
@@ -49,7 +84,7 @@ const HeaderMain = () => {
             <div className="relative">
               <HiOutlineShoppingBag />
               <div className="bg-blue-600 rounded-full absolute top-0 right-0 w-[18px] h-[18px] text-[12px] text-white grid place-items-center translate-x-1 -translate-y-1">
-                {cartItems.length} {/* 👈 Dynamic cart count */}
+                {cartItems.length}
               </div>
             </div>
           </Link>

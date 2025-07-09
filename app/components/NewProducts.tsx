@@ -1,80 +1,73 @@
-import React from 'react';
-import ProductCard from './ProductCard';
+"use client";
 
-const productsData = [
-    {
-        img:"/England.webp",
-        title: "England Euro 24",
-        desc: "Home Kit",
-        rating: 5,
-        price: "50.00",
-    },
-    {
-        img:"/France.jpg",
-        title: "France Euro 24",
-        desc: "Home Kit",
-        rating: 4,
-        price: "50.00",
-    },
-    {
-        img:"/Belgium.webp",
-        title: "Belgium Euro 24",
-        desc: "Home Kit",
-        rating: 5,
-        price: "50.00",
-    },
-    {
-        img:"/Portugal.webp",
-        title: "Portugal Euro 24",
-        desc: "Home Kit",
-        rating: 4,
-        price: "50.00",
-    },
-    {
-        img:"/Germany.webp",
-        title: "Germany Euro 24",
-        desc: "Home Kit",
-        rating: 5,
-        price: "50.00",
-    },
-    {
-        img:"/Germany Retro.webp",
-        title: "Germany 1996 Retro ",
-        desc: "Home Kit",
-        rating: 5,
-        price: "50.00",
-    },
-    {
-        img:"/Predator.avif",
-        title: "Adidas Predator Boots",
-        desc: "Home Kit",
-        rating: 5,
-        price: "30.00",
-    },
-    {
-        img:"/Grey Adidas.avif",
-        title: "Adidas Strung Boots",
-        desc: "Home Kit",
-        rating: 4,
-        price: "30.00",
-    },
-];
+import { useEffect, useState } from "react";
+import ProductCard from "./ProductCard";
+import supabase from "../supabaseClient";
 
-const NewProducts = () => {
-  return (
-    <div>
-        <div className='container pt-16'>
-            <h2 className='font-medium text-2xl pb-4'>Latest Products</h2>
-
-            <div className='grid grid-cols-1 place-items-center sm:place-items-start sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 xl:gap-x-20 xl:gap-y-10'>
-                {productsData.map((item,index) => (
-                <ProductCard key={index} img={item.img} title={item.title} desc={item.desc} rating={item.rating} price={item.price} id={0}/>
-            ))}
-            </div>
-        </div>
-      
-    </div>
-  )
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image_url: string;
+  rating: number;
 }
 
-export default NewProducts
+const NewProducts = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("id, name, description, price, image_url, rating");
+        if (error) throw error;
+        setProducts(data || []);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  if (loading) {
+    return <div className="container mx-auto p-4 text-center">Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-4 text-center text-red-500">
+        {error}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="container mx-auto pt-8">
+        <h2 className="font-semibold text-2xl mb-4">Latest Products</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 xl:gap-x-20 xl:gap-y-10 place-items-center sm:place-items-start">
+          {products.map((item) => (
+            <ProductCard
+              key={item.id}
+              id={item.id}
+              img={item.image_url}
+              title={item.name}
+              desc={item.description}
+              rating={item.rating}
+              price={item.price.toString()}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default NewProducts;
