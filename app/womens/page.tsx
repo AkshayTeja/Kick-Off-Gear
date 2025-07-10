@@ -78,14 +78,14 @@ const WomensPage = () => {
   return (
     <div className="container mx-auto py-10 px-4">
       <h1 className="text-3xl font-bold mb-8 text-center text-blackish">
-        Women's Collection
+        Women&apos;s Collection
       </h1>
 
       <div className="max-w-3xl mx-auto text-center mb-4">
         <p className="text-xl text-gray-800 leading-relaxed">
-          Discover our curated selection of women's football jerseys, designed
-          for style and performance. From classic designs to modern fits, find
-          the perfect kit to showcase your passion for the game.
+          Discover our curated selection of women&apos;s football jerseys,
+          designed for style and performance. From classic designs to modern
+          fits, find the perfect kit to showcase your passion for the game.
         </p>
       </div>
 
@@ -106,7 +106,7 @@ const WomensPage = () => {
               ))
             ) : (
               <p className="text-center text-gray-600 col-span-full">
-                No products found in the Women's category.
+                No products found in the Women&apos;s category.
               </p>
             )}
           </div>

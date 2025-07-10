@@ -106,7 +106,7 @@ const MensPage = () => {
               ))
             ) : (
               <p className="text-center text-gray-600 col-span-full">
-                No products found in the Shoes category.
+                No products found in the Footballs category.
               </p>
             )}
           </div>

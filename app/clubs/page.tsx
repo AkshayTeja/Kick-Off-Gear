@@ -78,7 +78,7 @@ const ClubsPage = () => {
   return (
     <div className="container mx-auto py-10 px-4">
       <h1 className="text-3xl font-bold mb-8 text-center text-blackish">
-        Club's Collection
+        Club&apos;s Collection
       </h1>
 
       <div className="max-w-3xl mx-auto text-center mb-4">
@@ -106,7 +106,7 @@ const ClubsPage = () => {
               ))
             ) : (
               <p className="text-center text-gray-600 col-span-full">
-                No products found in the Club's category.
+                No products found in the Club&apos;s category.
               </p>
             )}
           </div>

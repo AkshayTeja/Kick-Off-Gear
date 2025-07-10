@@ -145,10 +145,10 @@ const Navbar = () => {
           </div>
 
           <Link className="navbar__link relative" href="/mens">
-            MEN'S
+            MEN&apos;S
           </Link>
           <Link className="navbar__link relative" href="/womens">
-            WOMEN'S
+            WOMEN&apos;S
           </Link>
           <Link className="navbar__link relative" href="/retro">
             RETRO

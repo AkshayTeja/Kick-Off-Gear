@@ -83,11 +83,12 @@ const MensPage = () => {
 
       <div className="max-w-3xl mx-auto text-center mb-4">
         <p className="text-xl text-gray-800 leading-relaxed">
-          Don't miss out on our flash sale featuring an unbeatable collection of
-          men's football jerseys and essential gear. Whether you're after
-          timeless styles or the latest performance fits, this is your chance to
-          snag top-quality stuff at incredible prices. Gear up, show your pride,
-          and dominate the pitch for less! These deals won't last long!
+          Don&apos;t miss out on our flash sale featuring an unbeatable
+          collection of men&apos;s football jerseys and essential gear. Whether
+          you&apos;re after timeless styles or the latest performance fits, this
+          is your chance to snag top-quality stuff at incredible prices. Gear
+          up, show your pride, and dominate the pitch for less! These deals
+          won&apos;t last long!
         </p>
       </div>
 

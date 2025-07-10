@@ -31,9 +31,9 @@ const Testimonials = () => {
                 alt="Quotes"
               />
               <p className="text-gray-600 max-w-[250px]">
-                "The quality of the jerseys is outstanding! Fast shipping and
-                excellent customer service made my shopping experience a
-                breeze."
+                &quot;The quality of the jerseys is outstanding! Fast shipping
+                and excellent customer service made my shopping experience a
+                breeze.&quot;
               </p>
             </div>
           </div>
@@ -58,8 +58,8 @@ const Testimonials = () => {
                 alt="Quotes"
               />
               <p className="text-gray-600 max-w-[250px]">
-                "Loved the variety of products! The website is easy to navigate,
-                and my order arrived right on time."
+                &quot;Loved the variety of products! The website is easy to
+                navigate, and my order arrived right on time.&quot;
               </p>
             </div>
           </div>
@@ -84,8 +84,8 @@ const Testimonials = () => {
                 alt="Quotes"
               />
               <p className="text-gray-600 max-w-[250px]">
-                "Amazing deals and authentic merchandise. The special collection
-                is a must-have for any fan!"
+                &quot;Amazing deals and authentic merchandise. The special
+                collection is a must-have for any fan!&quot;
               </p>
             </div>
           </div>
