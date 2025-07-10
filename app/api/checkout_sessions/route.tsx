@@ -30,7 +30,11 @@ export async function OPTIONS() {
   );
 }
 
-export async function POST(request) {
+export async function POST(request: {
+  json: () =>
+    | PromiseLike<{ items: any; success_url: any; cancel_url: any }>
+    | { items: any; success_url: any; cancel_url: any };
+}) {
   try {
     // Log environment variables for debugging
     console.log("Environment variables:", {
