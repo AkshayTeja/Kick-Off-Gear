@@ -3,8 +3,8 @@ import Stripe from "stripe";
 import { NextResponse } from "next/server";
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
