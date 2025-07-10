@@ -8,6 +8,8 @@ import { HiOutlineShoppingBag } from "react-icons/hi";
 import { IoFootballSharp } from "react-icons/io5";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { User } from "@supabase/supabase-js";
 import supabase from "../supabaseClient";
 
 interface Product {
@@ -17,15 +19,26 @@ interface Product {
 }
 
 const HeaderMain = () => {
-  const [user, setUser] = useState(null);
-  const [wishlistCount, setWishlistCount] = useState(0);
-  const [cartCount, setCartCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [wishlistCount, setWishlistCount] = useState<number>(0);
+  const [cartCount, setCartCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
+    // Validate environment variables
+    if (
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ) {
+      setError("Supabase configuration is missing. Please contact support.");
+      setLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
         // Fetch user
@@ -33,7 +46,8 @@ const HeaderMain = () => {
           data: { user },
           error: userError,
         } = await supabase.auth.getUser();
-        if (userError) throw userError;
+        if (userError)
+          throw new Error("Failed to fetch user: " + userError.message);
         setUser(user);
 
         if (!user) {
@@ -44,23 +58,25 @@ const HeaderMain = () => {
         }
 
         // Fetch wishlist count
-        const { data: wishlistData, error: wishlistError } = await supabase
+        const { count: wishlistCount, error: wishlistError } = await supabase
           .from("wishlist")
           .select("id", { count: "exact" })
           .eq("user_id", user.id);
-        if (wishlistError) throw wishlistError;
-        setWishlistCount(wishlistData.length);
+        if (wishlistError)
+          throw new Error("Failed to fetch wishlist: " + wishlistError.message);
+        setWishlistCount(wishlistCount || 0);
 
         // Fetch cart count
-        const { data: cartData, error: cartError } = await supabase
+        const { count: cartCount, error: cartError } = await supabase
           .from("cart")
           .select("id", { count: "exact" })
           .eq("user_id", user.id);
-        if (cartError) throw cartError;
-        setCartCount(cartData.length);
+        if (cartError)
+          throw new Error("Failed to fetch cart: " + cartError.message);
+        setCartCount(cartCount || 0);
       } catch (err: any) {
         console.error("Fetch error:", err.message);
-        setError(err.message);
+        setError(err.message || "An unexpected error occurred.");
       } finally {
         setLoading(false);
       }
@@ -71,12 +87,17 @@ const HeaderMain = () => {
     // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          fetchData();
-        } else {
-          setWishlistCount(0);
-          setCartCount(0);
+        try {
+          setUser(session?.user ?? null);
+          if (session?.user) {
+            fetchData();
+          } else {
+            setWishlistCount(0);
+            setCartCount(0);
+          }
+        } catch (err: any) {
+          console.error("Auth state change error:", err.message);
+          setError(err.message || "An error occurred during authentication.");
         }
       }
     );
@@ -84,7 +105,7 @@ const HeaderMain = () => {
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -99,11 +120,11 @@ const HeaderMain = () => {
           .select("id, name, image_url")
           .or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
           .limit(5);
-        if (error) throw error;
+        if (error) throw new Error("Search failed: " + error.message);
         setSearchResults(data || []);
       } catch (err: any) {
         console.error("Search error:", err.message);
-        setError(err.message);
+        setError(err.message || "Failed to fetch search results.");
       }
     };
 
@@ -118,16 +139,26 @@ const HeaderMain = () => {
   const handleSearchBlur = () => {
     setTimeout(() => {
       setSearchResults([]);
-    }, 200); // Delay to allow clicks on results
+    }, 300); // Increased delay for better UX
   };
 
   const handleProfileClick = () => {
-    if (user) {
-      window.location.href = "/profile";
-    } else {
-      window.location.href = "/auth";
-    }
+    router.push(user ? "/profile" : "/auth");
   };
+
+  if (error) {
+    return (
+      <div className="bg-red-500 text-white p-4 text-center">
+        {error}
+        <button
+          onClick={() => setError(null)}
+          className="ml-4 text-white underline"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="border-b border-gray-200 py-6">
@@ -177,30 +208,37 @@ const HeaderMain = () => {
         </div>
 
         <div className="hidden lg:flex gap-4 text-gray-500 text-[30px]">
-          <button onClick={handleProfileClick}>
+          <button onClick={handleProfileClick} aria-label="Profile">
             <BiUser />
           </button>
 
-          <Link href="/wishlist">
+          <Link href="/wishlist" aria-label="Wishlist">
             <div className="relative">
               <FiHeart />
               <div className="bg-blue-600 rounded-full absolute top-0 right-0 w-[18px] h-[18px] text-[12px] text-white grid place-items-center translate-x-1 -translate-y-1">
-                {loading ? 0 : wishlistCount}
+                {loading ? (
+                  <div className="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full"></div>
+                ) : (
+                  wishlistCount
+                )}
               </div>
             </div>
           </Link>
 
-          <Link href="/cart">
+          <Link href="/cart" aria-label="Cart">
             <div className="relative">
               <HiOutlineShoppingBag />
               <div className="bg-blue-600 rounded-full absolute top-0 right-0 w-[18px] h-[18px] text-[12px] text-white grid place-items-center translate-x-1 -translate-y-1">
-                {loading ? 0 : cartCount}
+                {loading ? (
+                  <div className="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full"></div>
+                ) : (
+                  cartCount
+                )}
               </div>
             </div>
           </Link>
         </div>
       </div>
-      {error && <div className="text-center text-red-500 mt-2">{error}</div>}
     </div>
   );
 };
