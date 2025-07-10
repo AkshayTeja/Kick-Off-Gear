@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,20 +30,42 @@ export async function OPTIONS() {
   );
 }
 
-export async function POST(request: {
-  json: () =>
-    | PromiseLike<{ items: any; success_url: any; cancel_url: any }>
-    | { items: any; success_url: any; cancel_url: any };
-}) {
+interface CartItem {
+  product_id: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+interface RequestBody {
+  items: CartItem[];
+  success_url: string;
+  cancel_url: string;
+}
+
+export async function POST(request: NextRequest) {
   try {
-    // Log environment variables for debugging
+    // Validate environment variables
+    if (
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+      !process.env.STRIPE_SECRET_KEY
+    ) {
+      throw new Error("Missing required environment variables");
+    }
+
+    // Log environment variables for debugging (partial keys for security)
     console.log("Environment variables:", {
-      SUPABASE_URL: process.env.SUPABASE_URL,
-      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY?.slice(0, 10),
+      SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.slice(
+        0,
+        10
+      ),
       STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY?.slice(0, 10),
     });
 
-    const { items, success_url, cancel_url } = await request.json();
+    const { items, success_url, cancel_url }: RequestBody =
+      await request.json();
     console.log("Request body:", { items, success_url, cancel_url });
 
     // Validate request body
@@ -134,7 +156,7 @@ export async function POST(request: {
         },
       }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Checkout error:", error.message, error.stack);
     return NextResponse.json(
       { error: error.message },
