@@ -1,91 +1,114 @@
 "use client";
-import React from "react";
+
+import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
+import supabase from "../supabaseClient";
 
-const productsData = [
-  {
-    img: "/England.webp",
-    title: "England Euro 24",
-    desc: "Home Kit",
-    rating: 5,
-    price: "50.00",
-  },
-  {
-    img: "/France.jpg",
-    title: "France Euro 24",
-    desc: "Home Kit",
-    rating: 4,
-    price: "50.00",
-  },
-  {
-    img: "/Belgium.webp",
-    title: "Belgium Euro 24",
-    desc: "Home Kit",
-    rating: 5,
-    price: "50.00",
-  },
-  {
-    img: "/Portugal.webp",
-    title: "Portugal Euro 24",
-    desc: "Home Kit",
-    rating: 4,
-    price: "50.00",
-  },
-  {
-    img: "/Germany.webp",
-    title: "Germany Euro 24",
-    desc: "Home Kit",
-    rating: 5,
-    price: "50.00",
-  },
-  {
-    img: "/Germany Retro.webp",
-    title: "Germany 1996 Retro ",
-    desc: "Home Kit",
-    rating: 5,
-    price: "50.00",
-  },
-  {
-    img: "/Predator.avif",
-    title: "Adidas Predator Boots",
-    desc: "Home Kit",
-    rating: 5,
-    price: "30.00",
-  },
-  {
-    img: "/Grey Adidas.avif",
-    title: "Adidas Strung Boots",
-    desc: "Home Kit",
-    rating: 4,
-    price: "30.00",
-  },
-];
+interface Product {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  image_url: string;
+  rating: number;
+}
 
-const MensPage = () => {
+const WomensPage = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        // Fetch womens category ID
+        const { data: category, error: categoryError } = await supabase
+          .from("categories")
+          .select("id")
+          .eq("name", "mens")
+          .single();
+        if (categoryError) throw categoryError;
+        if (!category) {
+          throw new Error("Womens category not found");
+        }
+
+        const womensCategoryId = category.id;
+
+        // Fetch products in the womens category
+        const { data, error } = await supabase
+          .from("products")
+          .select("id, name, description, price, image_url, rating")
+          .in(
+            "id",
+            await supabase
+              .from("product_categories")
+              .select("product_id")
+              .eq("category_id", womensCategoryId)
+              .then(({ data }) => data?.map((item) => item.product_id) || [])
+          )
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        setProducts(data || []);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4 text-center text-gray-600">
+        Loading...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-4 text-center text-red-500">
+        {error}
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-center text-blackish">Women&apos;s</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center text-blackish">
+        Women's Collection
+      </h1>
 
-      {/* Engaging Introduction Text */}
       <div className="max-w-3xl mx-auto text-center mb-4">
         <p className="text-xl text-gray-800 leading-relaxed">
-        Explore our extensive collection of women&apos;s football jerseys, each piece designed with authenticity and passion. From iconic national teams to legendary club sides, we&apos;sve got the perfect jersey to show your support. Find your perfect fit and wear it with pride.
+          Discover our curated selection of women's football jerseys, designed
+          for style and performance. From classic designs to modern fits, find
+          the perfect kit to showcase your passion for the game.
         </p>
       </div>
 
       <div>
         <div className="container pt-10">
-
           <div className="grid grid-cols-1 place-items-center sm:place-items-start sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 xl:gap-x-20 xl:gap-y-10">
-            {productsData.map((item, index) => (
-              <ProductCard
-                key={index}
-                img={item.img}
-                title={item.title}
-                desc={item.desc}
-                rating={item.rating}
-                price={item.price} id={0}              />
-            ))}
+            {products.length > 0 ? (
+              products.map((item) => (
+                <ProductCard
+                  key={item.id}
+                  id={item.id}
+                  img={item.image_url}
+                  title={item.name}
+                  desc={item.description || "No description available"}
+                  rating={item.rating}
+                  price={item.price.toFixed(2)}
+                />
+              ))
+            ) : (
+              <p className="text-center text-gray-600 col-span-full">
+                No products found in the Women's category.
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -93,4 +116,4 @@ const MensPage = () => {
   );
 };
 
-export default MensPage;
+export default WomensPage;

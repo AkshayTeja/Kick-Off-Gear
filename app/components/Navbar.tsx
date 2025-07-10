@@ -14,16 +14,17 @@ const Navbar = () => {
   const categories = [
     {
       name: "Football Jerseys",
-      href: "/categories/football-jerseys",
+      href: "/mens",
       subcategories: [
         { name: "Men", href: "/mens" },
         { name: "Women", href: "/womens" },
+        { name: "Retro", href: "/retro" },
+        { name: "Club", href: "/clubs" },
       ],
     },
-    { name: "Training Kits", href: "/categories/training-kits" },
-    { name: "Football Shoes", href: "/categories/football-shoes" },
-    { name: "Footballs", href: "/categories/footballs" },
-    { name: "Accessories", href: "/categories/accessories" },
+    { name: "Football Shoes", href: "/football-shoes" },
+    { name: "Footballs", href: "/footballs" },
+    { name: "Accessories", href: "/accessories" },
   ];
 
   const handleDropdownEnter = () => {
@@ -50,7 +51,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="hidden lg:block relative z-10">
+    <div className="hidden lg:block relative z-20">
       <div className="container">
         <div className="flex w-fit gap-10 mx-auto font-medium py-4 text-blackish">
           <Link className="navbar__link relative" href="/">
@@ -155,7 +156,7 @@ const Navbar = () => {
           <Link className="navbar__link relative" href="/clubs">
             CLUBS
           </Link>
-          <Link className="navbar__link relative" href="#">
+          <Link className="navbar__link relative" href="/hot-offers">
             HOT OFFERS
           </Link>
         </div>

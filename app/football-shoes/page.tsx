@@ -13,7 +13,7 @@ interface Product {
   rating: number;
 }
 
-const ClubsPage = () => {
+const MensPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,20 +21,20 @@ const ClubsPage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Fetch clubs category ID
+        // Fetch mens category ID
         const { data: category, error: categoryError } = await supabase
           .from("categories")
           .select("id")
-          .eq("name", "clubs")
+          .eq("name", "football shoes")
           .single();
         if (categoryError) throw categoryError;
         if (!category) {
-          throw new Error("Clubs category not found");
+          throw new Error("Shoes category not found");
         }
 
-        const clubsCategoryId = category.id;
+        const shoesCategoryId = category.id;
 
-        // Fetch products in the clubs category
+        // Fetch products in the football shoes category
         const { data, error } = await supabase
           .from("products")
           .select("id, name, description, price, image_url, rating")
@@ -43,7 +43,7 @@ const ClubsPage = () => {
             await supabase
               .from("product_categories")
               .select("product_id")
-              .eq("category_id", clubsCategoryId)
+              .eq("category_id", shoesCategoryId)
               .then(({ data }) => data?.map((item) => item.product_id) || [])
           )
           .order("created_at", { ascending: false });
@@ -78,14 +78,14 @@ const ClubsPage = () => {
   return (
     <div className="container mx-auto py-10 px-4">
       <h1 className="text-3xl font-bold mb-8 text-center text-blackish">
-        Club's Collection
+        Football Shoes
       </h1>
 
       <div className="max-w-3xl mx-auto text-center mb-4">
         <p className="text-xl text-gray-800 leading-relaxed">
-          Discover our curated selection of club football jerseys, designed for
-          style and performance. From classic designs to modern fits, find the
-          perfect kit to showcase your passion for the game.
+          Discover our curated selection of football shoes, designed for style
+          and performance. From classic designs to modern fits, find the perfect
+          boots to showcase your passion for the game.
         </p>
       </div>
 
@@ -106,7 +106,7 @@ const ClubsPage = () => {
               ))
             ) : (
               <p className="text-center text-gray-600 col-span-full">
-                No products found in the Club's category.
+                No products found in the Shoes category.
               </p>
             )}
           </div>
@@ -116,4 +116,4 @@ const ClubsPage = () => {
   );
 };
 
-export default ClubsPage;
+export default MensPage;
