@@ -6,7 +6,6 @@ import HeaderMain from "@/app/components/HeaderMain";
 import Navbar from "@/app/components/Navbar";
 import MobNavbar from "@/app/components/MobNavbar";
 import Footer from "@/app/components/Footer";
-import { CartProvider } from "@/app/context/CartContext";
 
 export default function LayoutClient({
   children,
@@ -20,19 +19,17 @@ export default function LayoutClient({
   return (
     <html lang="en">
       <body>
-        <CartProvider>
-          {!isAuth && (
-            <>
-              {isHome && <HeaderTop />}
-              <HeaderMain />
-              <Navbar />
-            </>
-          )}
+        {!isAuth && (
+          <>
+            {isHome && <HeaderTop />}
+            <HeaderMain />
+            <Navbar />
+          </>
+        )}
 
-          <MobNavbar />
-          {children}
-          <Footer />
-        </CartProvider>
+        <MobNavbar />
+        {children}
+        <Footer />
       </body>
     </html>
   );

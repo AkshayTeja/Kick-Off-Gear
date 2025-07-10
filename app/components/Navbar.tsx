@@ -1,6 +1,7 @@
 "use client";
-import Link from 'next/link';
-import React, { useState, useRef } from 'react';
+
+import Link from "next/link";
+import React, { useState, useRef } from "react";
 
 const Navbar = () => {
   const [showCategoriesDropdown, setShowCategoriesDropdown] = useState(false);
@@ -15,11 +16,11 @@ const Navbar = () => {
       name: "Football Jerseys",
       href: "/categories/football-jerseys",
       subcategories: [
-        { name: "Men", href: "/mens" },      
-        { name: "Women", href: "/womens" },  
+        { name: "Men", href: "/mens" },
+        { name: "Women", href: "/womens" },
       ],
     },
-    { name: "Training Kits", href: "/categories/training-kits"},
+    { name: "Training Kits", href: "/categories/training-kits" },
     { name: "Football Shoes", href: "/categories/football-shoes" },
     { name: "Footballs", href: "/categories/footballs" },
     { name: "Accessories", href: "/categories/accessories" },
@@ -49,10 +50,12 @@ const Navbar = () => {
   };
 
   return (
-    <div className="hidden lg:block relative z-20">
+    <div className="hidden lg:block relative z-10">
       <div className="container">
         <div className="flex w-fit gap-10 mx-auto font-medium py-4 text-blackish">
-          <Link className="navbar__link relative" href="/">HOME</Link>
+          <Link className="navbar__link relative" href="/">
+            HOME
+          </Link>
 
           {/* Categories with dropdown */}
           <div
@@ -88,8 +91,14 @@ const Navbar = () => {
                   <div
                     key={index}
                     className="relative group"
-                    onMouseEnter={() => category.name === "Football Jerseys" && handleSubmenuEnter()}
-                    onMouseLeave={() => category.name === "Football Jerseys" && handleSubmenuLeave()}
+                    onMouseEnter={() =>
+                      category.name === "Football Jerseys" &&
+                      handleSubmenuEnter()
+                    }
+                    onMouseLeave={() =>
+                      category.name === "Football Jerseys" &&
+                      handleSubmenuLeave()
+                    }
                   >
                     <Link
                       href={category.href}
@@ -134,11 +143,21 @@ const Navbar = () => {
             )}
           </div>
 
-          <Link className="navbar__link relative" href="/mens">MEN&apos;S</Link>
-          <Link className="navbar__link relative" href="/womens">WOMEN&apos;S</Link>
-          <Link className="navbar__link relative" href="/retro">RETRO</Link>
-          <Link className="navbar__link relative" href="/clubs">CLUBS</Link>
-          <Link className="navbar__link relative" href="#">HOT OFFERS</Link>
+          <Link className="navbar__link relative" href="/mens">
+            MEN'S
+          </Link>
+          <Link className="navbar__link relative" href="/womens">
+            WOMEN'S
+          </Link>
+          <Link className="navbar__link relative" href="/retro">
+            RETRO
+          </Link>
+          <Link className="navbar__link relative" href="/clubs">
+            CLUBS
+          </Link>
+          <Link className="navbar__link relative" href="#">
+            HOT OFFERS
+          </Link>
         </div>
       </div>
     </div>

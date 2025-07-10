@@ -4,7 +4,6 @@ import "./globals.css";
 import LayoutClient from "./LayoutClient";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { CartProvider } from "./context/CartContext";
 import Footer from "./components/Footer"; // Import your Footer component
 
 const inter = Inter({ subsets: ["latin"] });
@@ -23,13 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} flex flex-col min-h-screen`}>
-        <CartProvider>
-          <LayoutClient>
-            <div className="flex-grow">
-              {children}
-            </div>
-          </LayoutClient>
-        </CartProvider>
+        <LayoutClient>
+          <div className="flex-grow">{children}</div>
+        </LayoutClient>
       </body>
     </html>
   );
