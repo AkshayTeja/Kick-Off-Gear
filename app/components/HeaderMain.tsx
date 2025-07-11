@@ -47,37 +47,47 @@ const HeaderMain = () => {
           error: userError,
         } = await supabase.auth.getUser();
         if (userError && userError.message !== "Auth session missing") {
-          throw new Error("Failed to fetch user: " + userError.message);
+          console.error("Fetch user error:", userError.message);
+          setError(`Failed to fetch user: ${userError.message}`);
+          setLoading(false);
+          return;
         }
         setUser(user);
 
         if (!user) {
-          // Guest user: set counts to 0 and proceed
           setWishlistCount(0);
           setCartCount(0);
           setLoading(false);
           return;
         }
 
-        // Fetch wishlist count for authenticated user
+        // Fetch wishlist count
         const { count: wishlistCount, error: wishlistError } = await supabase
           .from("wishlist")
           .select("id", { count: "exact" })
           .eq("user_id", user.id);
-        if (wishlistError)
-          throw new Error("Failed to fetch wishlist: " + wishlistError.message);
+        if (wishlistError) {
+          console.error("Fetch wishlist error:", wishlistError.message);
+          setError(`Failed to fetch wishlist: ${wishlistError.message}`);
+          setLoading(false);
+          return;
+        }
         setWishlistCount(wishlistCount || 0);
 
-        // Fetch cart count for authenticated user
+        // Fetch cart count
         const { count: cartCount, error: cartError } = await supabase
           .from("cart")
           .select("id", { count: "exact" })
           .eq("user_id", user.id);
-        if (cartError)
-          throw new Error("Failed to fetch cart: " + cartError.message);
+        if (cartError) {
+          console.error("Fetch cart error:", cartError.message);
+          setError(`Failed to fetch cart: ${cartError.message}`);
+          setLoading(false);
+          return;
+        }
         setCartCount(cartCount || 0);
       } catch (err: any) {
-        console.error("Fetch error:", err.message);
+        console.error("Unexpected fetch error:", err.message);
         setError(err.message || "An unexpected error occurred.");
       } finally {
         setLoading(false);
