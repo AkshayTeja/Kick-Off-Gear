@@ -46,7 +46,14 @@ const HeaderMain = () => {
           data: { user },
           error: userError,
         } = await supabase.auth.getUser();
-        if (userError && userError.message !== "Auth session missing") {
+        if (userError) {
+          if (userError.message === "Auth session missing") {
+            setUser(null);
+            setWishlistCount(0);
+            setCartCount(0);
+            setLoading(false);
+            return; // Exit early without setting error
+          }
           console.error("Fetch user error:", userError.message);
           setError(`Failed to fetch user: ${userError.message}`);
           setLoading(false);
