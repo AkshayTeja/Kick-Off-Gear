@@ -13,8 +13,8 @@ export default function LayoutClient({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isHome = pathname === "/";
-  const isAuth = pathname === "/auth" || pathname.startsWith("/auth/");
+  const isAuth = pathname === "/";
+  const isHome = pathname === "/home";
 
   return (
     <html lang="en">

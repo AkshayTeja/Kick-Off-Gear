@@ -37,7 +37,7 @@ export default function AuthPage() {
           password,
         });
         if (error) throw error;
-        alert("Sign-up successful! Check your email for verification.");
+        router.push("/home");
       } else {
         // Sign in
         const { error } = await supabase.auth.signInWithPassword({
