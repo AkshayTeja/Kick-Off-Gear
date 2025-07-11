@@ -57,7 +57,7 @@ export default function ProfilePage() {
           throw new Error("Failed to fetch user: " + userError.message);
         }
         if (!user) {
-          router.push("/auth");
+          router.push("/");
           return;
         }
         setUser(user);
@@ -108,7 +108,7 @@ export default function ProfilePage() {
       (event, session) => {
         setUser(session?.user ?? null);
         if (!session?.user) {
-          router.push("/auth");
+          router.push("/");
         } else {
           fetchData();
         }
@@ -123,7 +123,7 @@ export default function ProfilePage() {
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
-      router.push("/auth");
+      router.push("/");
     } catch (err: any) {
       console.error("Sign out error:", err.message);
       setError(err.message);
