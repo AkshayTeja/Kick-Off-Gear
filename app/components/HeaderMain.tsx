@@ -3,25 +3,25 @@
 import React, { useEffect, useState, useRef } from "react";
 import { BiUser } from "react-icons/bi";
 import { BsSearch } from "react-icons/bs";
-import { FiHeart, FiShoppingBag, FiShoppingCart } from "react-icons/fi";
-import { HiOutlineShoppingBag } from "react-icons/hi";
+import { FiHeart, FiShoppingCart } from "react-icons/fi";
 import {
   IoFootballSharp,
   IoMenuOutline,
   IoCloseOutline,
 } from "react-icons/io5";
+import { TiHomeOutline } from "react-icons/ti";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 import supabase from "../supabaseClient";
-import { FaHome } from "react-icons/fa";
-import { TiHomeOutline } from "react-icons/ti";
 
 interface Product {
   id: string;
   name: string;
   image_url: string;
+  description?: string;
+  category_names?: string[]; // Array of category names
 }
 
 const HeaderMain = () => {
@@ -54,6 +54,16 @@ const HeaderMain = () => {
     { name: "Footballs", href: "/footballs" },
     { name: "Accessories", href: "/accessories" },
   ];
+
+  // Simple synonym dictionary for NLP
+  const synonymMap: { [key: string]: string[] } = {
+    jersey: ["shirt", "kit", "uniform"],
+    shoe: ["boots", "cleats", "footwear"],
+    ball: ["football", "soccer ball"],
+    men: ["mens", "male"],
+    women: ["womens", "female"],
+    retro: ["vintage", "classic"],
+  };
 
   useEffect(() => {
     // Validate environment variables
@@ -153,6 +163,19 @@ const HeaderMain = () => {
     };
   }, [router]);
 
+  // NLP Search Logic
+  const processSearchQuery = (query: string): string[] => {
+    // Tokenize the query
+    const tokens = query.toLowerCase().split(/\s+/);
+
+    // Expand tokens with synonyms
+    const expandedTerms = tokens.flatMap((token) =>
+      synonymMap[token] ? [token, ...synonymMap[token]] : [token]
+    );
+
+    return Array.from(new Set(expandedTerms)); // Remove duplicates
+  };
+
   useEffect(() => {
     const fetchSearchResults = async () => {
       if (!searchTerm.trim()) {
@@ -161,13 +184,68 @@ const HeaderMain = () => {
       }
 
       try {
-        const { data, error } = await supabase
+        const searchTerms = processSearchQuery(searchTerm);
+
+        // Build the query with joins to include category names
+        let query = supabase
           .from("products")
-          .select("id, name, image_url")
-          .or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+          .select(
+            `
+            id,
+            name,
+            image_url,
+            description,
+            product_categories (
+              categories (name)
+            )
+          `
+          )
           .limit(5);
+
+        // Build OR conditions for each term across name and description
+        const orConditions = searchTerms
+          .map((term) => `name.ilike.%${term}%,description.ilike.%${term}%`)
+          .join(",");
+
+        query = query.or(orConditions);
+
+        const { data, error } = await query;
+
         if (error) throw new Error("Search failed: " + error.message);
-        setSearchResults(data || []);
+
+        // Process data to include category names and filter by category matches
+        const processedData: Product[] = (data || [])
+          .map((product) => ({
+            id: product.id,
+            name: product.name,
+            image_url: product.image_url,
+            description: product.description,
+            category_names: product.product_categories.map(
+              (pc: any) => pc.categories.name
+            ),
+          }))
+          .filter(
+            (product) =>
+              searchTerms.some((term) =>
+                product.category_names?.some((cat) =>
+                  cat.toLowerCase().includes(term)
+                )
+              ) ||
+              searchTerms.some(
+                (term) =>
+                  product.name.toLowerCase().includes(term) ||
+                  product.description?.toLowerCase().includes(term)
+              )
+          );
+
+        // Simple relevance ranking: prioritize matches in name, then description, then category
+        const rankedResults = processedData.sort((a, b) => {
+          const aScore = calculateRelevance(a, searchTerms);
+          const bScore = calculateRelevance(b, searchTerms);
+          return bScore - aScore;
+        });
+
+        setSearchResults(rankedResults);
       } catch (err: any) {
         console.error("Search error:", err.message);
         setError(err.message || "Failed to fetch search results.");
@@ -177,6 +255,26 @@ const HeaderMain = () => {
     const debounce = setTimeout(fetchSearchResults, 300);
     return () => clearTimeout(debounce);
   }, [searchTerm]);
+
+  // Calculate relevance score for ranking
+  const calculateRelevance = (
+    product: Product,
+    searchTerms: string[]
+  ): number => {
+    let score = 0;
+    const name = product.name?.toLowerCase() || "";
+    const description = product.description?.toLowerCase() || "";
+    const categoryNames = product.category_names || [];
+
+    searchTerms.forEach((term) => {
+      if (name.includes(term)) score += 3; // Higher weight for name matches
+      if (description.includes(term)) score += 2; // Medium weight for description
+      if (categoryNames.some((cat) => cat.toLowerCase().includes(term)))
+        score += 1; // Lower weight for category
+    });
+
+    return score;
+  };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -268,7 +366,7 @@ const HeaderMain = () => {
             <input
               className="border-gray-200 border p-2 px-4 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="text"
-              placeholder="What are you looking for?"
+              placeholder="Search for jerseys, shoes, or accessories..."
               value={searchTerm}
               onChange={handleSearchChange}
               onBlur={handleSearchBlur}
@@ -293,7 +391,15 @@ const HeaderMain = () => {
                         alt={product.name}
                         className="h-[50px] w-[50px] object-cover rounded"
                       />
-                      <span className="text-gray-800">{product.name}</span>
+                      <div>
+                        <span className="text-gray-800">{product.name}</span>
+                        {product.category_names &&
+                          product.category_names.length > 0 && (
+                            <span className="block text-sm text-gray-500">
+                              {product.category_names.join(", ")}
+                            </span>
+                          )}
+                      </div>
                     </Link>
                   ))
                 ) : (
@@ -322,7 +428,7 @@ const HeaderMain = () => {
             <input
               className="border-gray-200 border p-2 px-4 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="text"
-              placeholder="What are you looking for?"
+              placeholder="Search for jerseys, shoes, or accessories..."
               value={searchTerm}
               onChange={handleSearchChange}
               onBlur={handleSearchBlur}
@@ -347,7 +453,15 @@ const HeaderMain = () => {
                         alt={product.name}
                         className="h-[50px] w-[50px] object-cover rounded"
                       />
-                      <span className="text-gray-800">{product.name}</span>
+                      <div>
+                        <span className="text-gray-800">{product.name}</span>
+                        {product.category_names &&
+                          product.category_names.length > 0 && (
+                            <span className="block text-sm text-gray-500">
+                              {product.category_names.join(", ")}
+                            </span>
+                          )}
+                      </div>
                     </Link>
                   ))
                 ) : (
@@ -536,7 +650,7 @@ const HeaderMain = () => {
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               strokeWidth={2}
-                              d="M9 5l7 7-7 7"
+                              d="M9 5l-7 7 7 7"
                             />
                           </svg>
                         )}
@@ -574,14 +688,14 @@ const HeaderMain = () => {
               className="py-2 text-gray-800 hover:text-blue-600 text-lg"
               onClick={toggleMenu}
             >
-              MEN&apos;S
+              MEN'S
             </Link>
             <Link
               href="/womens"
               className="py-2 text-gray-800 hover:text-blue-600 text-lg"
               onClick={toggleMenu}
             >
-              WOMEN&apos;S
+              WOMEN'S
             </Link>
             <Link
               href="/retro"

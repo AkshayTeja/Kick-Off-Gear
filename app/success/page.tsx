@@ -153,7 +153,7 @@ const SuccessPage = () => {
         </p>
       )}
       <button
-        onClick={() => router.push("/")}
+        onClick={() => router.push("/home")}
         className="mt-6 inline-block bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
       >
         Return to Home
