@@ -141,8 +141,8 @@ export default function CartPage() {
   }
 
   return (
-    <div className="container mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
+    <div className="container mx-auto py-6 px-4 sm:px-6">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6">Your Cart</h1>
       {cartItems.length === 0 ? (
         <div className="text-center">
           <p className="text-gray-600 mb-4">Your cart is empty!</p>
@@ -151,11 +151,11 @@ export default function CartPage() {
           </Link>
         </div>
       ) : (
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Cart Items */}
           <div className="lg:w-2/3">
             <div className="bg-white shadow-md rounded-lg overflow-hidden">
-              <div className="hidden md:grid md:grid-cols-5 gap-4 bg-gray-100 p-4 font-semibold text-gray-700">
+              <div className="hidden sm:grid sm:grid-cols-5 gap-2 bg-gray-100 p-3 font-semibold text-gray-700 text-sm">
                 <div className="col-span-2">Product</div>
                 <div>Price</div>
                 <div>Quantity</div>
@@ -164,46 +164,54 @@ export default function CartPage() {
               {cartItems.map((item) => (
                 <div
                   key={item.id}
-                  className="border-b border-gray-200 p-4 flex flex-col md:grid md:grid-cols-5 gap-4 items-center"
+                  className="border-b border-gray-200 p-3 sm:p-4 flex flex-col sm:grid sm:grid-cols-5 gap-2 sm:gap-4 items-start sm:items-center"
                 >
                   <div className="col-span-2">
-                    <h3 className="font-medium text-lg">{item.item_name}</h3>
+                    <h3 className="font-medium text-base sm:text-lg">
+                      {item.item_name}
+                    </h3>
                     {item.item_description && (
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-600 text-xs sm:text-sm">
                         {item.item_description}
                       </p>
                     )}
                     <button
                       onClick={() => removeFromCart(item.id)}
-                      className="text-red-500 hover:underline text-sm mt-2"
+                      className="text-red-500 hover:underline text-xs sm:text-sm mt-2"
                     >
                       Remove
                     </button>
                   </div>
-                  <div>${item.item_price.toFixed(2)}</div>
+                  <div className="text-sm sm:text-base">
+                    ${item.item_price.toFixed(2)}
+                  </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                      className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 text-sm"
                       disabled={item.quantity <= 1}
                     >
                       -
                     </button>
-                    <span>{item.quantity}</span>
+                    <span className="text-sm sm:text-base">
+                      {item.quantity}
+                    </span>
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                      className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 text-sm"
                     >
                       +
                     </button>
                   </div>
-                  <div>${(item.item_price * item.quantity).toFixed(2)}</div>
+                  <div className="text-sm sm:text-base">
+                    ${(item.item_price * item.quantity).toFixed(2)}
+                  </div>
                 </div>
               ))}
             </div>
             <Link
               href="/"
-              className="mt-6 inline-block text-blue-600 hover:underline font-medium"
+              className="mt-4 inline-block text-blue-600 hover:underline font-medium text-sm sm:text-base"
             >
               Continue Shopping
             </Link>
@@ -211,9 +219,11 @@ export default function CartPage() {
 
           {/* Order Summary */}
           <div className="lg:w-1/3">
-            <div className="bg-white shadow-md rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-              <div className="space-y-2">
+            <div className="bg-white shadow-md rounded-lg p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold mb-4">
+                Order Summary
+              </h2>
+              <div className="space-y-2 text-sm sm:text-base">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span>${subtotal.toFixed(2)}</span>
@@ -226,13 +236,16 @@ export default function CartPage() {
                   <span>Shipping</span>
                   <span>Free</span>
                 </div>
-                <div className="flex justify-between font-bold text-lg pt-2 border-t border-gray-200">
+                <div className="flex justify-between font-bold text-base sm:text-lg pt-2 border-t border-gray-200">
                   <span>Total</span>
                   <span>${total.toFixed(2)}</span>
                 </div>
               </div>
               <form onSubmit={applyCoupon} className="mt-4">
-                <label htmlFor="coupon" className="block text-gray-700 mb-1">
+                <label
+                  htmlFor="coupon"
+                  className="block text-gray-700 mb-1 text-sm sm:text-base"
+                >
                   Coupon Code
                 </label>
                 <div className="flex gap-2">
@@ -241,23 +254,25 @@ export default function CartPage() {
                     type="text"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                     placeholder="Enter coupon code"
                   />
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm sm:text-base"
                   >
                     Apply
                   </button>
                 </div>
                 {couponError && (
-                  <p className="text-red-500 text-sm mt-2">{couponError}</p>
+                  <p className="text-red-500 text-xs sm:text-sm mt-2">
+                    {couponError}
+                  </p>
                 )}
               </form>
               <button
                 onClick={() => router.push("/checkout")}
-                className="w-full mt-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200"
+                className="w-full mt-4 py-2 sm:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 text-sm sm:text-base"
               >
                 Proceed to Checkout
               </button>

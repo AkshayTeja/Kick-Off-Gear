@@ -5,8 +5,12 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slide from "./Slide";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const Hero = () => {
+  const router = useRouter();
+
   const settings = {
     dots: true,
     infinite: true,
@@ -56,7 +60,39 @@ const Hero = () => {
 
   return (
     <div className="bg-white">
-      <div className="container mx-auto px-4 py-8">
+      {/* Mobile Layout */}
+      <div className="block md:hidden container mx-auto px-4 py-8">
+        <div className="space-y-6">
+          {slideData.map((item) => (
+            <div
+              key={item.id}
+              className="relative rounded-xl overflow-hidden shadow-lg"
+            >
+              <Image
+                src={item.img}
+                alt={item.title}
+                width={800}
+                height={400}
+                className="w-full h-[200px] object-cover"
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center items-center text-center p-4">
+                <h2 className="text-white text-[20px] font-bold mb-3">
+                  {item.title}
+                </h2>
+                <button
+                  className="bg-blue-600 text-white text-[14px] font-bold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  onClick={() => router.push(item.link)}
+                >
+                  Shop Now
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop Carousel */}
+      <div className="hidden md:block container mx-auto px-4 py-8">
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden rounded-2xl">
           <Slider {...settings}>
             {slideData.map((item) => (

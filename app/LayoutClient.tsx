@@ -27,7 +27,6 @@ export default function LayoutClient({
           </>
         )}
 
-        <MobNavbar />
         {children}
         <Footer />
       </body>

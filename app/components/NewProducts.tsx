@@ -50,19 +50,20 @@ const NewProducts = () => {
 
   return (
     <div>
-      <div className="container mx-auto pt-8">
+      <div className="container mx-auto pt-8 px-4">
         <h2 className="font-semibold text-2xl mb-4">Latest Products</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 xl:gap-x-20 xl:gap-y-10 place-items-center sm:place-items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-10 xl:gap-x-20 xl:gap-y-10 place-items-center sm:place-items-start">
           {products.map((item) => (
-            <ProductCard
-              key={item.id}
-              id={item.id}
-              img={item.image_url}
-              title={item.name}
-              desc={item.description}
-              rating={item.rating}
-              price={item.price.toString()}
-            />
+            <div key={item.id} className="w-full max-w-[300px] sm:max-w-none">
+              <ProductCard
+                id={item.id}
+                img={item.image_url}
+                title={item.name}
+                desc={item.description}
+                rating={item.rating}
+                price={item.price.toString()}
+              />
+            </div>
           ))}
         </div>
       </div>

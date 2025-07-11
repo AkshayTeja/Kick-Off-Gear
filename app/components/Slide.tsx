@@ -14,8 +14,8 @@ const Slide: React.FC<propsType> = ({ img, title, mainTitle, price, link }) => {
   const router = useRouter();
 
   return (
-    <div className="outline-none border-none relative">
-      <div className="absolute left-[30px] md:left-[70px] max-w-[250px] sm:max-w-[350px] top-[50%] -translate-y-[50%] space-y-2 lg:space-y-4 bg-[#ffffffa2] sm:bg-transparent p-4 sm:p-0 rounded-lg sm:rounded-none">
+    <div className="hidden md:block outline-none border-none relative">
+      <div className="absolute left-[30px] md:left-[70px] max-w-[250px] sm:max-w-[350px] top-[50%] -translate-y-[50%] space-y-2 lg:space-y-4 bg-[#ffffffa2] md:bg-transparent p-4 md:p-0 rounded-lg md:rounded-none">
         <h2
           className="text-[24px] lg:text-[28px] bg-blackish text-white md:text-[16px] p-5 rounded-lg cursor-pointer hover:bg-blue-600 text-center font-bold"
           onClick={() => router.push(link)}

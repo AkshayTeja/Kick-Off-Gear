@@ -53,25 +53,27 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6">
+      <div className="w-full max-w-[90%] sm:max-w-md bg-white p-6 sm:p-8 rounded-lg shadow-lg">
         {/* Logo */}
-        <div className="flex justify-center items-center mb-6">
-          <IoFootballSharp className="text-4xl text-blue-600" />
-          <h1 className="text-2xl font-bold text-blackish pl-2">KickOffGear</h1>
+        <div className="flex justify-center items-center mb-4 sm:mb-6">
+          <IoFootballSharp className="text-3xl sm:text-4xl text-blue-600" />
+          <h1 className="text-xl sm:text-2xl font-bold text-blackish pl-2">
+            KickOffGear
+          </h1>
         </div>
 
         {/* Form Title */}
-        <h2 className="text-2xl font-bold text-center mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6">
           {isSignUp ? "Create an Account" : "Sign In"}
         </h2>
 
         {/* Form */}
         <form onSubmit={handleSubmit}>
-          <div className="mb-5">
+          <div className="mb-4 sm:mb-5">
             <label
               htmlFor="email"
-              className="block text-gray-700 font-medium mb-2"
+              className="block text-gray-700 font-medium text-sm sm:text-base mb-2"
             >
               Email
             </label>
@@ -80,14 +82,14 @@ export default function AuthPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="border-gray-200 border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="border-gray-200 border p-2 sm:p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base"
               required
             />
           </div>
-          <div className="mb-5">
+          <div className="mb-4 sm:mb-5">
             <label
               htmlFor="password"
-              className="block text-gray-700 font-medium mb-2"
+              className="block text-gray-700 font-medium text-sm sm:text-base mb-2"
             >
               Password
             </label>
@@ -96,23 +98,25 @@ export default function AuthPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="border-gray-200 border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="border-gray-200 border p-2 sm:p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base"
               required
             />
           </div>
           {error && (
-            <p className="text-red-500 text-sm mb-5 text-center">{error}</p>
+            <p className="text-red-500 text-xs sm:text-sm mb-4 sm:mb-5 text-center">
+              {error}
+            </p>
           )}
           <button
             type="submit"
-            className="bg-blue-600 text-white px-4 py-3 rounded-lg w-full hover:bg-blue-700 transition-colors"
+            className="bg-blue-600 text-white px-4 py-2 sm:py-3 rounded-lg w-full hover:bg-blue-700 transition-colors text-sm sm:text-base"
           >
             {isSignUp ? "Sign Up" : "Sign In"}
           </button>
         </form>
 
         {/* Toggle Link */}
-        <p className="mt-6 text-center text-gray-600">
+        <p className="mt-4 sm:mt-6 text-center text-gray-600 text-sm sm:text-base">
           {isSignUp ? "Already have an account?" : "Need an account?"}
           <button
             onClick={() => setIsSignUp(!isSignUp)}

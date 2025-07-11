@@ -123,6 +123,10 @@ const WishlistPage = () => {
     }
   };
 
+  const handleProductClick = (itemId: string) => {
+    router.push(`/products/${itemId}`);
+  };
+
   const generateRating = (rating: number) => {
     const stars = Array(5)
       .fill(0)
@@ -162,38 +166,42 @@ const WishlistPage = () => {
               key={item.id}
               className="relative bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 max-w-[300px] w-full mx-auto overflow-hidden group"
             >
-              <div className="relative overflow-hidden">
-                <Image
-                  className="w-full h-[200px] object-cover transition-transform duration-300 group-hover:scale-105"
-                  src={item.img}
-                  width={300}
-                  height={200}
-                  alt={item.item_name}
-                />
-                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-
-              <div className="p-4 space-y-3">
-                <h2 className="text-lg font-semibold text-gray-800 line-clamp-1">
-                  {item.item_name}
-                </h2>
-                <p className="text-sm text-gray-500 line-clamp-2">
-                  {item.item_description}
-                </p>
-                <div>{generateRating(item.rating)}</div>
-                <div className="flex items-center gap-3">
-                  <span className="text-lg font-bold text-gray-900">
-                    ${item.item_price.toFixed(2)}
-                  </span>
+              <div
+                className="cursor-pointer"
+                onClick={() => handleProductClick(item.item_id)}
+              >
+                <div className="relative overflow-hidden">
+                  <Image
+                    className="w-full h-[200px] object-cover transition-transform duration-300 group-hover:scale-105"
+                    src={item.img}
+                    width={300}
+                    height={200}
+                    alt={item.item_name}
+                  />
+                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-                <button
-                  onClick={() => handleRemoveFromWishlist(item.item_id)}
-                  className="w-full py-2 px-4 rounded-lg font-medium text-white bg-red-500 hover:bg-red-600 transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2"
-                >
-                  <AiFillHeart className="text-white text-xl" />
-                  Remove from Wishlist
-                </button>
+                <div className="p-4 space-y-3">
+                  <h2 className="text-lg font-semibold text-gray-800 line-clamp-1">
+                    {item.item_name}
+                  </h2>
+                  <p className="text-sm text-gray-500 line-clamp-2">
+                    {item.item_description}
+                  </p>
+                  <div>{generateRating(item.rating)}</div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg font-bold text-gray-900">
+                      ${item.item_price.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
               </div>
+              <button
+                onClick={() => handleRemoveFromWishlist(item.item_id)}
+                className="w-full py-2 px-4 rounded-lg font-medium text-white bg-red-500 hover:bg-red-600 transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2"
+              >
+                <AiFillHeart className="text-white text-xl" />
+                Remove from Wishlist
+              </button>
             </div>
           ))}
         </div>

@@ -1,16 +1,22 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { BiUser } from "react-icons/bi";
 import { BsSearch } from "react-icons/bs";
-import { FiHeart } from "react-icons/fi";
+import { FiHeart, FiShoppingBag, FiShoppingCart } from "react-icons/fi";
 import { HiOutlineShoppingBag } from "react-icons/hi";
-import { IoFootballSharp } from "react-icons/io5";
+import {
+  IoFootballSharp,
+  IoMenuOutline,
+  IoCloseOutline,
+} from "react-icons/io5";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 import supabase from "../supabaseClient";
+import { FaHome } from "react-icons/fa";
+import { TiHomeOutline } from "react-icons/ti";
 
 interface Product {
   id: string;
@@ -26,7 +32,28 @@ const HeaderMain = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showCategoriesDropdown, setShowCategoriesDropdown] = useState(false);
+  const [showFootballSubmenu, setShowFootballSubmenu] = useState(false);
+  const dropdownTimeout = useRef<NodeJS.Timeout | null>(null);
+  const submenuTimeout = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
+
+  const categories = [
+    {
+      name: "Football Jerseys",
+      href: "/mens",
+      subcategories: [
+        { name: "Men", href: "/mens" },
+        { name: "Women", href: "/womens" },
+        { name: "Retro", href: "/retro" },
+        { name: "Club", href: "/clubs" },
+      ],
+    },
+    { name: "Football Shoes", href: "/football-shoes" },
+    { name: "Footballs", href: "/footballs" },
+    { name: "Accessories", href: "/accessories" },
+  ];
 
   useEffect(() => {
     // Validate environment variables
@@ -52,7 +79,7 @@ const HeaderMain = () => {
             setWishlistCount(0);
             setCartCount(0);
             setLoading(false);
-            return; // Exit early without setting error
+            return;
           }
           console.error("Fetch user error:", userError.message);
           setError(`Failed to fetch user: ${userError.message}`);
@@ -158,11 +185,45 @@ const HeaderMain = () => {
   const handleSearchBlur = () => {
     setTimeout(() => {
       setSearchResults([]);
-    }, 300); // Increased delay for better UX
+    }, 300);
   };
 
   const handleProfileClick = () => {
     router.push(user ? "/profile" : "/auth");
+    setIsMenuOpen(false);
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    setShowCategoriesDropdown(false);
+    setShowFootballSubmenu(false);
+  };
+
+  const handleDropdownEnter = () => {
+    if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
+    setShowCategoriesDropdown(true);
+  };
+
+  const handleDropdownLeave = () => {
+    dropdownTimeout.current = setTimeout(() => {
+      setShowCategoriesDropdown(false);
+      setShowFootballSubmenu(false);
+    }, 150);
+  };
+
+  const handleSubmenuEnter = () => {
+    if (submenuTimeout.current) clearTimeout(submenuTimeout.current);
+    setShowFootballSubmenu(true);
+  };
+
+  const handleSubmenuLeave = () => {
+    submenuTimeout.current = setTimeout(() => {
+      setShowFootballSubmenu(false);
+    }, 150);
+  };
+
+  const toggleFootballSubmenu = () => {
+    setShowFootballSubmenu(!showFootballSubmenu);
   };
 
   if (error) {
@@ -181,81 +242,369 @@ const HeaderMain = () => {
 
   return (
     <div className="border-b border-gray-200 py-6">
-      <div className="container sm:flex justify-between items-center gap-5">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="flex font-bold text-center pb-4 sm:pb-0 text-blackish hover:opacity-80 transition-opacity"
-        >
-          <IoFootballSharp className="text-3xl text-blue-600" />
-          <h1 className="pt-1 pl-1">KickOffGear</h1>
-        </Link>
+      <div className="container mx-auto px-4">
+        {/* Mobile Layout */}
+        <div className="lg:hidden">
+          {/* Logo and Hamburger Icon */}
+          <div className="flex justify-between items-center mb-4">
+            <Link
+              href="/home"
+              className="flex font-bold text-center text-blackish hover:opacity-80 transition-opacity"
+            >
+              <IoFootballSharp className="text-3xl text-blue-600" />
+              <h1 className="pt-1 pl-1">KickOffGear</h1>
+            </Link>
+            <button
+              className="text-gray-500 text-[30px]"
+              onClick={toggleMenu}
+              aria-label="Toggle Menu"
+            >
+              {isMenuOpen ? <IoCloseOutline /> : <IoMenuOutline />}
+            </button>
+          </div>
 
-        <div className="w-full sm:w-[300px] md:w-[70%] relative">
-          <input
-            className="border-gray-200 border p-2 px-4 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            type="text"
-            placeholder="What are you looking for?"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            onBlur={handleSearchBlur}
-          />
-          <BsSearch
-            className="absolute right-0 top-0 mr-3 mt-3 text-gray-400"
-            size={20}
-          />
-          {searchResults.length > 0 && (
-            <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-2 z-50">
-              {searchResults.map((product) => (
-                <Link
-                  key={product.id}
-                  href={`/products/${product.id}`}
-                  className="flex items-center gap-4 p-3 hover:bg-gray-100 transition-colors"
-                >
-                  <Image
-                    src={product.image_url || "/placeholder.jpg"}
-                    width={50}
-                    height={50}
-                    alt={product.name}
-                    className="h-[50px] w-[50px] object-cover rounded"
-                  />
-                  <span className="text-gray-800">{product.name}</span>
-                </Link>
-              ))}
-            </div>
-          )}
+          {/* Search Bar */}
+          <div className="w-full relative">
+            <input
+              className="border-gray-200 border p-2 px-4 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="text"
+              placeholder="What are you looking for?"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              onBlur={handleSearchBlur}
+            />
+            <BsSearch
+              className="absolute right-0 top-0 mr-3 mt-3 text-gray-400"
+              size={20}
+            />
+            {searchTerm.trim() && (
+              <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-2 z-40">
+                {searchResults.length > 0 ? (
+                  searchResults.map((product) => (
+                    <Link
+                      key={product.id}
+                      href={`/products/${product.id}`}
+                      className="flex items-center gap-4 p-3 hover:bg-gray-100 transition-colors duration-200"
+                    >
+                      <Image
+                        src={product.image_url || "/placeholder.jpg"}
+                        width={50}
+                        height={50}
+                        alt={product.name}
+                        className="h-[50px] w-[50px] object-cover rounded"
+                      />
+                      <span className="text-gray-800">{product.name}</span>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="p-3 text-center text-gray-500">
+                    No products found
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="hidden lg:flex gap-4 text-gray-500 text-[30px]">
-          <button onClick={handleProfileClick} aria-label="Profile">
-            <BiUser />
-          </button>
-
-          <Link href="/wishlist" aria-label="Wishlist">
-            <div className="relative">
-              <FiHeart />
-              <div className="bg-blue-600 rounded-full absolute top-0 right-0 w-[18px] h-[18px] text-[12px] text-white grid place-items-center translate-x-1 -translate-y-1">
-                {loading ? (
-                  <div className="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full"></div>
-                ) : (
-                  wishlistCount
-                )}
-              </div>
-            </div>
+        {/* Desktop Layout */}
+        <div className="hidden lg:flex items-center justify-between gap-8">
+          {/* Logo */}
+          <Link
+            href="/home"
+            className="flex font-bold text-center text-blackish hover:opacity-80 transition-opacity flex-shrink-0"
+          >
+            <IoFootballSharp className="text-3xl text-blue-600" />
+            <h1 className="pt-1 pl-1">KickOffGear</h1>
           </Link>
 
-          <Link href="/cart" aria-label="Cart">
-            <div className="relative">
-              <HiOutlineShoppingBag />
-              <div className="bg-blue-600 rounded-full absolute top-0 right-0 w-[18px] h-[18px] text-[12px] text-white grid place-items-center translate-x-1 -translate-y-1">
-                {loading ? (
-                  <div className="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full"></div>
+          {/* Search Bar */}
+          <div className="flex-1 max-w-md relative">
+            <input
+              className="border-gray-200 border p-2 px-4 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="text"
+              placeholder="What are you looking for?"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              onBlur={handleSearchBlur}
+            />
+            <BsSearch
+              className="absolute right-0 top-0 mr-3 mt-3 text-gray-400"
+              size={20}
+            />
+            {searchTerm.trim() && (
+              <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-2 z-40">
+                {searchResults.length > 0 ? (
+                  searchResults.map((product) => (
+                    <Link
+                      key={product.id}
+                      href={`/products/${product.id}`}
+                      className="flex items-center gap-4 p-3 hover:bg-gray-100 transition-colors duration-200"
+                    >
+                      <Image
+                        src={product.image_url || "/placeholder.jpg"}
+                        width={50}
+                        height={50}
+                        alt={product.name}
+                        className="h-[50px] w-[50px] object-cover rounded"
+                      />
+                      <span className="text-gray-800">{product.name}</span>
+                    </Link>
+                  ))
                 ) : (
-                  cartCount
+                  <div className="p-3 text-center text-gray-500">
+                    No products found
+                  </div>
                 )}
               </div>
+            )}
+          </div>
+
+          {/* Desktop Icons */}
+          <div className="flex gap-4 text-gray-500 text-[30px] flex-shrink-0">
+            <button onClick={handleProfileClick} aria-label="Profile">
+              <BiUser />
+            </button>
+            <Link href="/wishlist" aria-label="Wishlist">
+              <div className="relative">
+                <FiHeart />
+                {wishlistCount > 0 && (
+                  <div className="bg-blue-600 rounded-full absolute -top-2 -right-2 w-[18px] h-[18px] text-[12px] text-white flex items-center justify-center">
+                    {loading ? (
+                      <div className="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full"></div>
+                    ) : (
+                      <span className="font-semibold">{wishlistCount}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </Link>
+            <Link href="/cart" aria-label="Cart">
+              <div className="relative">
+                <FiShoppingCart />
+                {cartCount > 0 && (
+                  <div className="bg-blue-600 rounded-full absolute -top-2 -right-2 w-[18px] h-[18px] text-[12px] text-white flex items-center justify-center">
+                    {loading ? (
+                      <div className="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full"></div>
+                    ) : (
+                      <span className="font-semibold">{cartCount}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown Menu */}
+        <div
+          className={`lg:hidden fixed top-0 right-0 h-full w-64 bg-white border-l border-gray-200 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
+            isMenuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          <div className="flex flex-col items-start py-6 px-4">
+            <button
+              className="self-end text-gray-500 text-[30px] mb-4"
+              onClick={toggleMenu}
+              aria-label="Close Menu"
+            >
+              <IoCloseOutline />
+            </button>
+
+            {/* Home */}
+            <Link
+              href="/home"
+              className="py-2 text-gray-800 hover:text-blue-600 text-lg flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <TiHomeOutline size={24} />
+              HOME
+            </Link>
+
+            {/* Profile */}
+            <button
+              className="py-2 text-gray-800 hover:text-blue-600 text-lg flex items-center gap-2"
+              onClick={handleProfileClick}
+            >
+              <BiUser size={24} />
+              PROFILE
+            </button>
+
+            {/* Wishlist */}
+            <Link
+              href="/wishlist"
+              className="py-2 text-gray-800 hover:text-blue-600 text-lg flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <div className="relative">
+                <FiHeart size={24} />
+                {wishlistCount > 0 && (
+                  <div className="bg-blue-600 rounded-full absolute -top-2 -right-2 w-[18px] h-[18px] text-[12px] text-white flex items-center justify-center">
+                    {loading ? (
+                      <div className="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full"></div>
+                    ) : (
+                      <span className="font-semibold">{wishlistCount}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+              WISHLIST
+            </Link>
+
+            {/* Cart */}
+            <Link
+              href="/cart"
+              className="py-2 text-gray-800 hover:text-blue-600 text-lg flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <div className="relative">
+                <FiShoppingCart size={24} />
+                {cartCount > 0 && (
+                  <div className="bg-blue-600 rounded-full absolute -top-2 -right-2 w-[18px] h-[18px] text-[12px] text-white flex items-center justify-center">
+                    {loading ? (
+                      <div className="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full"></div>
+                    ) : (
+                      <span className="font-semibold">{cartCount}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+              CART
+            </Link>
+
+            {/* Categories */}
+            <div className="relative py-2 w-full">
+              <div
+                className="flex items-center gap-1 text-gray-800 hover:text-blue-600 cursor-pointer text-lg"
+                onClick={() =>
+                  setShowCategoriesDropdown(!showCategoriesDropdown)
+                }
+              >
+                CATEGORIES
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  showCategoriesDropdown
+                    ? "max-h-96 opacity-100"
+                    : "max-h-0 opacity-0"
+                }`}
+              >
+                <div className="mt-2 w-full bg-white rounded-md py-2">
+                  {categories.map((category, index) => (
+                    <div key={index} className="relative">
+                      <div
+                        className="flex items-center justify-between px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
+                        onClick={
+                          category.name === "Football Jerseys"
+                            ? toggleFootballSubmenu
+                            : toggleMenu
+                        }
+                      >
+                        <Link
+                          href={category.href}
+                          className="flex-grow"
+                          onClick={(e) => {
+                            if (category.name === "Football Jerseys") {
+                              e.preventDefault();
+                            }
+                          }}
+                        >
+                          {category.name}
+                        </Link>
+                        {category.subcategories && (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 ml-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      {category.subcategories && (
+                        <div
+                          className={`overflow-hidden transition-all duration-300 ease-in-out pl-4 ${
+                            showFootballSubmenu &&
+                            category.name === "Football Jerseys"
+                              ? "max-h-96 opacity-100"
+                              : "max-h-0 opacity-0"
+                          }`}
+                        >
+                          {category.subcategories.map((sub, subIndex) => (
+                            <Link
+                              key={subIndex}
+                              href={sub.href}
+                              className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 transition-colors duration-200"
+                              onClick={toggleMenu}
+                            >
+                              {sub.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </Link>
+
+            {/* Individual category links */}
+            <Link
+              href="/mens"
+              className="py-2 text-gray-800 hover:text-blue-600 text-lg"
+              onClick={toggleMenu}
+            >
+              MEN'S
+            </Link>
+            <Link
+              href="/womens"
+              className="py-2 text-gray-800 hover:text-blue-600 text-lg"
+              onClick={toggleMenu}
+            >
+              WOMEN'S
+            </Link>
+            <Link
+              href="/retro"
+              className="py-2 text-gray-800 hover:text-blue-600 text-lg"
+              onClick={toggleMenu}
+            >
+              RETRO
+            </Link>
+            <Link
+              href="/clubs"
+              className="py-2 text-gray-800 hover:text-blue-600 text-lg"
+              onClick={toggleMenu}
+            >
+              CLUBS
+            </Link>
+            <Link
+              href="/hot-offers"
+              className="py-2 text-gray-800 hover:text-blue-600 text-lg"
+              onClick={toggleMenu}
+            >
+              HOT OFFERS
+            </Link>
+          </div>
         </div>
       </div>
     </div>
