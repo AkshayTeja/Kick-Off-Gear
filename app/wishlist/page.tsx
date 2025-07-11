@@ -32,13 +32,14 @@ const WishlistPage = () => {
           data: { user },
           error: userError,
         } = await supabase.auth.getUser();
-        if (userError) throw userError;
-        setUser(user);
-
+        if (userError && userError.message !== "Auth session missing") {
+          throw new Error("Failed to fetch user: " + userError.message);
+        }
         if (!user) {
           router.push("/auth");
           return;
         }
+        setUser(user);
 
         // Fetch wishlist items
         const { data: wishlistData, error: wishlistError } = await supabase

@@ -46,18 +46,20 @@ const HeaderMain = () => {
           data: { user },
           error: userError,
         } = await supabase.auth.getUser();
-        if (userError)
+        if (userError && userError.message !== "Auth session missing") {
           throw new Error("Failed to fetch user: " + userError.message);
+        }
         setUser(user);
 
         if (!user) {
+          // Guest user: set counts to 0 and proceed
           setWishlistCount(0);
           setCartCount(0);
           setLoading(false);
           return;
         }
 
-        // Fetch wishlist count
+        // Fetch wishlist count for authenticated user
         const { count: wishlistCount, error: wishlistError } = await supabase
           .from("wishlist")
           .select("id", { count: "exact" })
@@ -66,7 +68,7 @@ const HeaderMain = () => {
           throw new Error("Failed to fetch wishlist: " + wishlistError.message);
         setWishlistCount(wishlistCount || 0);
 
-        // Fetch cart count
+        // Fetch cart count for authenticated user
         const { count: cartCount, error: cartError } = await supabase
           .from("cart")
           .select("id", { count: "exact" })

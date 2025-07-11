@@ -32,13 +32,14 @@ export default function CartPage() {
           data: { user },
           error: userError,
         } = await supabase.auth.getUser();
-        if (userError) throw userError;
-        setUser(user);
-
+        if (userError && userError.message !== "Auth session missing") {
+          throw new Error("Failed to fetch user: " + userError.message);
+        }
         if (!user) {
           router.push("/auth");
           return;
         }
+        setUser(user);
 
         // Fetch cart items
         const { data, error } = await supabase
@@ -51,6 +52,7 @@ export default function CartPage() {
         if (error) throw error;
         setCartItems(data || []);
       } catch (err: any) {
+        console.error("Fetch error:", err.message);
         setError(err.message);
       } finally {
         setLoading(false);

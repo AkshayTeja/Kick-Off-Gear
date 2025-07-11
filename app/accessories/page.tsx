@@ -13,7 +13,7 @@ interface Product {
   rating: number;
 }
 
-const MensPage = () => {
+const AccessoriesPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -116,4 +116,4 @@ const MensPage = () => {
   );
 };
 
-export default MensPage;
+export default AccessoriesPage;
