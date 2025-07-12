@@ -710,14 +710,14 @@ const HeaderMain = () => {
               className="py-2 text-gray-800 hover:text-blue-600 text-lg"
               onClick={toggleMenu}
             >
-              MEN'S
+              MEN&apos;S
             </Link>
             <Link
               href="/womens"
               className="py-2 text-gray-800 hover:text-blue-600 text-lg"
               onClick={toggleMenu}
             >
-              WOMEN'S
+              WOMEN&apos;S
             </Link>
             <Link
               href="/retro"
