@@ -15,13 +15,14 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 import supabase from "../supabaseClient";
+import AudioSearch from "./AudioSearch";
 
 interface Product {
   id: string;
   name: string;
   image_url: string;
   description?: string;
-  category_names?: string[]; // Array of category names
+  category_names?: string[];
 }
 
 const HeaderMain = () => {
@@ -324,6 +325,15 @@ const HeaderMain = () => {
     setShowFootballSubmenu(!showFootballSubmenu);
   };
 
+  const handleAudioSearch = (term: string) => {
+    setSearchTerm(term);
+  };
+
+  const handleProductClick = () => {
+    setSearchResults([]); // Clear search results
+    setSearchTerm(""); // Optionally clear the search input
+  };
+
   if (error) {
     return (
       <div className="bg-red-500 text-white p-4 text-center">
@@ -361,54 +371,60 @@ const HeaderMain = () => {
             </button>
           </div>
 
-          {/* Search Bar */}
-          <div className="w-full relative">
-            <input
-              className="border-gray-200 border p-2 px-4 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              type="text"
-              placeholder="Search for jerseys, shoes, or accessories..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              onBlur={handleSearchBlur}
-            />
-            <BsSearch
-              className="absolute right-0 top-0 mr-3 mt-3 text-gray-400"
-              size={20}
-            />
-            {searchTerm.trim() && (
-              <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-2 z-40">
-                {searchResults.length > 0 ? (
-                  searchResults.map((product) => (
-                    <Link
-                      key={product.id}
-                      href={`/products/${product.id}`}
-                      className="flex items-center gap-4 p-3 hover:bg-gray-100 transition-colors duration-200"
-                    >
-                      <Image
-                        src={product.image_url || "/placeholder.jpg"}
-                        width={50}
-                        height={50}
-                        alt={product.name}
-                        className="h-[50px] w-[50px] object-cover rounded"
-                      />
-                      <div>
-                        <span className="text-gray-800">{product.name}</span>
-                        {product.category_names &&
-                          product.category_names.length > 0 && (
-                            <span className="block text-sm text-gray-500">
-                              {product.category_names.join(", ")}
-                            </span>
-                          )}
-                      </div>
-                    </Link>
-                  ))
-                ) : (
-                  <div className="p-3 text-center text-gray-500">
-                    No products found
-                  </div>
-                )}
-              </div>
-            )}
+          {/* Search Bar and Audio Button */}
+          <div className="flex items-center gap-2 w-full">
+            <div className="relative flex-1">
+              <input
+                className="border-gray-200 border p-2 px-4 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                type="text"
+                placeholder="Search for products"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onBlur={handleSearchBlur}
+              />
+              <BsSearch
+                className="absolute right-0 top-0 mr-3 mt-3 text-gray-400"
+                size={20}
+              />
+              {searchTerm.trim() && (
+                <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-2 z-40">
+                  {searchResults.length > 0 ? (
+                    searchResults.map((product) => (
+                      <Link
+                        key={product.id}
+                        href={`/products/${product.id}`}
+                        className="flex items-center gap-4 p-3 hover:bg-gray-100 transition-colors duration-200"
+                        onClick={() => handleProductClick()} // Add click handler
+                      >
+                        <Image
+                          src={product.image_url || "/placeholder.jpg"}
+                          width={50}
+                          height={50}
+                          alt={product.name}
+                          className="h-[50px] w-[50px] object-cover rounded"
+                        />
+                        <div>
+                          <span className="text-gray-800">{product.name}</span>
+                          {product.category_names &&
+                            product.category_names.length > 0 && (
+                              <span className="block text-sm text-gray-500">
+                                {product.category_names.join(", ")}
+                              </span>
+                            )}
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="p-3 text-center text-gray-500">
+                      No products found
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex-shrink-0">
+              <AudioSearch onSearch={handleAudioSearch} />
+            </div>
           </div>
         </div>
 
@@ -423,54 +439,60 @@ const HeaderMain = () => {
             <h1 className="pt-1 pl-1">KickOffGear</h1>
           </Link>
 
-          {/* Search Bar */}
-          <div className="flex-1 max-w-md relative">
-            <input
-              className="border-gray-200 border p-2 px-4 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              type="text"
-              placeholder="Search for jerseys, shoes, or accessories..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              onBlur={handleSearchBlur}
-            />
-            <BsSearch
-              className="absolute right-0 top-0 mr-3 mt-3 text-gray-400"
-              size={20}
-            />
-            {searchTerm.trim() && (
-              <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-2 z-40">
-                {searchResults.length > 0 ? (
-                  searchResults.map((product) => (
-                    <Link
-                      key={product.id}
-                      href={`/products/${product.id}`}
-                      className="flex items-center gap-4 p-3 hover:bg-gray-100 transition-colors duration-200"
-                    >
-                      <Image
-                        src={product.image_url || "/placeholder.jpg"}
-                        width={50}
-                        height={50}
-                        alt={product.name}
-                        className="h-[50px] w-[50px] object-cover rounded"
-                      />
-                      <div>
-                        <span className="text-gray-800">{product.name}</span>
-                        {product.category_names &&
-                          product.category_names.length > 0 && (
-                            <span className="block text-sm text-gray-500">
-                              {product.category_names.join(", ")}
-                            </span>
-                          )}
-                      </div>
-                    </Link>
-                  ))
-                ) : (
-                  <div className="p-3 text-center text-gray-500">
-                    No products found
-                  </div>
-                )}
-              </div>
-            )}
+          {/* Search Bar and Audio Button Container */}
+          <div className="flex items-center gap-3 flex-1 max-w-md">
+            <div className="relative flex-1">
+              <input
+                className="border-gray-200 border p-2 px-4 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                type="text"
+                placeholder="Search for products"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onBlur={handleSearchBlur}
+              />
+              <BsSearch
+                className="absolute right-0 top-0 mr-3 mt-3 text-gray-400"
+                size={20}
+              />
+              {searchTerm.trim() && (
+                <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-2 z-40">
+                  {searchResults.length > 0 ? (
+                    searchResults.map((product) => (
+                      <Link
+                        key={product.id}
+                        href={`/products/${product.id}`}
+                        className="flex items-center gap-4 p-3 hover:bg-gray-100 transition-colors duration-200"
+                        onClick={() => handleProductClick()} // Add click handler
+                      >
+                        <Image
+                          src={product.image_url || "/placeholder.jpg"}
+                          width={50}
+                          height={50}
+                          alt={product.name}
+                          className="h-[50px] w-[50px] object-cover rounded"
+                        />
+                        <div>
+                          <span className="text-gray-800">{product.name}</span>
+                          {product.category_names &&
+                            product.category_names.length > 0 && (
+                              <span className="block text-sm text-gray-500">
+                                {product.category_names.join(", ")}
+                              </span>
+                            )}
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="p-3 text-center text-gray-500">
+                      No products found
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex-shrink-0">
+              <AudioSearch onSearch={handleAudioSearch} />
+            </div>
           </div>
 
           {/* Desktop Icons */}
@@ -688,14 +710,14 @@ const HeaderMain = () => {
               className="py-2 text-gray-800 hover:text-blue-600 text-lg"
               onClick={toggleMenu}
             >
-              MEN&apos;S
+              MEN'S
             </Link>
             <Link
               href="/womens"
               className="py-2 text-gray-800 hover:text-blue-600 text-lg"
               onClick={toggleMenu}
             >
-              WOMEN&apos;S
+              WOMEN'S
             </Link>
             <Link
               href="/retro"
