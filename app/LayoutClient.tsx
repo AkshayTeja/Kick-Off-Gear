@@ -6,6 +6,7 @@ import HeaderMain from "@/app/components/HeaderMain";
 import Navbar from "@/app/components/Navbar";
 import MobNavbar from "@/app/components/MobNavbar";
 import Footer from "@/app/components/Footer";
+import ChatButton from "./components/ChatButton";
 
 export default function LayoutClient({
   children,
@@ -24,6 +25,7 @@ export default function LayoutClient({
             {isHome && <HeaderTop />}
             <HeaderMain />
             <Navbar />
+            <ChatButton />
           </>
         )}
 

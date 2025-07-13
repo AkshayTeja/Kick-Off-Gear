@@ -10,7 +10,6 @@ export default function Home() {
       <Hero />
       <NewProducts />
       <Testimonials />
-      <ChatButton />
     </main>
   );
 }
