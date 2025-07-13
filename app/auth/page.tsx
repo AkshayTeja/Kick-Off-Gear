@@ -32,11 +32,25 @@ export default function AuthPage() {
     try {
       if (isSignUp) {
         // Sign up
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
         });
         if (error) throw error;
+
+        // Insert user details into profiles table
+        if (data.user) {
+          const { error: profileError } = await supabase
+            .from("profiles")
+            .insert([
+              {
+                id: data.user.id,
+                email: email,
+              },
+            ]);
+          if (profileError) throw profileError;
+        }
+
         router.push("/home");
       } else {
         // Sign in

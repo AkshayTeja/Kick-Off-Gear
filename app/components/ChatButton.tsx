@@ -5,6 +5,9 @@ import { RiChat1Line } from "react-icons/ri";
 import supabase from "../supabaseClient";
 import { useRouter } from "next/navigation";
 
+// Note: Consider installing 'sanitize-html' to sanitize bot HTML responses
+// import sanitizeHtml from 'sanitize-html';
+
 // Define types
 interface Profile {
   email: string;
@@ -30,6 +33,7 @@ interface Product {
   category: string;
   description: string;
   stock: number;
+  image_url?: string;
 }
 
 const ChatButton: React.FC = () => {
@@ -41,11 +45,30 @@ const ChatButton: React.FC = () => {
   const [isBotTyping, setIsBotTyping] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const botUserId = "8d985be7-3fa1-453a-aa58-c73627a7a0e4";
+  const botUserId = "8d985be7-3fa1-453a-aa58-c73627a0e4";
 
-  // Simple bot response function using basic keyword matching
-  const generateBotResponse = (message: string): string => {
+  const generateBotResponse = async (message: string): Promise<string> => {
     const msg = message.toLowerCase();
+
+    // Check if the message is about orders (but not tracking)
+    if (msg.includes("order") || msg.includes("orders")) {
+      if (!msg.includes("track")) {
+        return "Head over to your profile to find your orders.";
+      }
+    }
+
+    // Check if the message is a product search query
+    if (
+      msg.includes("find") ||
+      msg.includes("search") ||
+      msg.includes("available") ||
+      msg.includes("availability") ||
+      msg.includes("jersey") ||
+      msg.includes("boot") ||
+      msg.includes("football")
+    ) {
+      return "To search or find products, head over to our search bar at the top of the page.";
+    }
 
     // FAQ responses
     if (msg.includes("shipping") || msg.includes("delivery")) {
@@ -53,7 +76,7 @@ const ChatButton: React.FC = () => {
     }
 
     if (msg.includes("return") || msg.includes("refund")) {
-      return "Returns are free within 30 days if unused and in original packaging. Contact support to start a return. Anything else?";
+      return "Returns are free within 30 days if unused and in packaging. Contact support to start a return. Anything else?";
     }
 
     if (msg.includes("payment") || msg.includes("pay")) {
@@ -65,16 +88,6 @@ const ChatButton: React.FC = () => {
     }
 
     if (
-      msg.includes("find") ||
-      msg.includes("search") ||
-      msg.includes("jersey") ||
-      msg.includes("boot") ||
-      msg.includes("football")
-    ) {
-      return "I'd love to help you find products! Try searching our store for jerseys, boots, or other football gear. What specific item are you looking for?";
-    }
-
-    if (
       msg.includes("promotion") ||
       msg.includes("offer") ||
       msg.includes("sale")
@@ -83,7 +96,7 @@ const ChatButton: React.FC = () => {
     }
 
     if (msg.includes("hello") || msg.includes("hi") || msg.includes("hey")) {
-      return "Hello! Welcome to Football Store. How can I help you today? I can assist with orders, shipping, returns, or help you find products!";
+      return "Hello! Welcome to KickOffGear. How can I help you today? I can assist with orders, shipping, returns, or help you find products!";
     }
 
     if (msg.includes("help")) {
@@ -118,11 +131,11 @@ const ChatButton: React.FC = () => {
           {
             id: Date.now(),
             user_id: botUserId,
-            content: `Welcome to Football Store, ${
+            content: `Welcome to KickOffGear, ${
               user.email?.split("@")[0] || "there"
-            }! How can I help you today? Try asking about shipping, returns, or finding products.`,
+            }! How can I help you today? Try asking about shipping, returns, or search for products (e.g., 'find football boots').`,
             created_at: new Date().toISOString(),
-            profiles: { email: "bot@footballstore.com" },
+            profiles: { email: "bot@kickoffgear.com" },
           },
         ]);
       } catch (err: unknown) {
@@ -162,7 +175,7 @@ const ChatButton: React.FC = () => {
       // Simulate thinking time
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      const botResponse = generateBotResponse(newMessage.trim());
+      const botResponse = await generateBotResponse(newMessage.trim());
 
       // Add bot response to UI
       const botMessage: Message = {
@@ -170,7 +183,7 @@ const ChatButton: React.FC = () => {
         user_id: botUserId,
         content: botResponse,
         created_at: new Date().toISOString(),
-        profiles: { email: "bot@footballstore.com" },
+        profiles: { email: "bot@kickoffgear.com" },
       };
 
       setMessages((prev) => [...prev, botMessage]);
@@ -248,29 +261,33 @@ const ChatButton: React.FC = () => {
               </svg>
             </button>
           </div>
-          <div className="h-48 overflow-y-auto mb-2 border border-gray-200 rounded p-2 text-sm sm:text-base">
+          <div className="h-64 overflow-y-auto mb-2 border border-gray-200 rounded p-2 text-sm sm:text-base">
             {messages.length > 0 ? (
               messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`mb-2 ${
+                  className={`mb-4 ${
                     message.user_id === user?.id ? "text-right" : "text-left"
                   }`}
                 >
-                  <span className="text-xs text-gray-500">
+                  <div className="block text-xs text-gray-500 mb-1">
                     {message.profiles?.email || "Unknown"} (
                     {new Date(message.created_at).toLocaleTimeString()})
-                  </span>
-                  <p
-                    className={`inline-block p-2 rounded-lg max-w-xs ${
-                      message.user_id === user?.id
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                    style={{ whiteSpace: "pre-wrap" }}
-                  >
-                    {message.content}
-                  </p>
+                  </div>
+                  {message.user_id === botUserId ? (
+                    <div
+                      className="inline-block p-2 rounded-lg max-w-xs bg-gray-100 text-gray-800"
+                      style={{ whiteSpace: "pre-wrap" }}
+                      dangerouslySetInnerHTML={{ __html: message.content }}
+                    />
+                  ) : (
+                    <div
+                      className="inline-block p-2 rounded-lg max-w-xs bg-blue-100 text-blue-800"
+                      style={{ whiteSpace: "pre-wrap" }}
+                    >
+                      {message.content}
+                    </div>
+                  )}
                 </div>
               ))
             ) : (

@@ -349,7 +349,7 @@ const HeaderMain = () => {
   }
 
   return (
-    <div className="border-b border-gray-200 py-6">
+    <div className="border-b border-gray-200 py-5">
       <div className="container mx-auto px-4">
         {/* Mobile Layout */}
         <div className="lg:hidden">
