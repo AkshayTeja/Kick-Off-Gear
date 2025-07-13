@@ -5,12 +5,10 @@ import { RiChat1Line } from "react-icons/ri";
 import supabase from "../supabaseClient";
 import { useRouter } from "next/navigation";
 
-// Note: Consider installing 'sanitize-html' to sanitize bot HTML responses
-// import sanitizeHtml from 'sanitize-html';
-
 // Define types
-interface Profile {
-  email: string;
+interface User {
+  id: string;
+  email?: string;
 }
 
 interface Message {
@@ -18,22 +16,7 @@ interface Message {
   user_id: string;
   content: string;
   created_at: string;
-  profiles?: Profile;
-}
-
-interface User {
-  id: string;
-  email?: string;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  category: string;
-  description: string;
-  stock: number;
-  image_url?: string;
+  email?: string; // Store email directly instead of profiles
 }
 
 const ChatButton: React.FC = () => {
@@ -46,18 +29,17 @@ const ChatButton: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const botUserId = "8d985be7-3fa1-453a-aa58-c73627a0e4";
+  const botEmail = "bot@kickoffgear.com";
 
   const generateBotResponse = async (message: string): Promise<string> => {
     const msg = message.toLowerCase();
 
-    // Check if the message is about orders (but not tracking)
     if (msg.includes("order") || msg.includes("orders")) {
       if (!msg.includes("track")) {
         return "Head over to your profile to find your orders.";
       }
     }
 
-    // Check if the message is a product search query
     if (
       msg.includes("find") ||
       msg.includes("search") ||
@@ -70,7 +52,6 @@ const ChatButton: React.FC = () => {
       return "To search or find products, head over to our search bar at the top of the page.";
     }
 
-    // FAQ responses
     if (msg.includes("shipping") || msg.includes("delivery")) {
       return "We offer standard shipping (3-5 days, $5) and express (1-2 days, $15). Track your order for updates! Need specific details? FREE SHIPPING THIS WEEK, ORDER OVER $1717";
     }
@@ -103,11 +84,10 @@ const ChatButton: React.FC = () => {
       return "I'm here to help! You can ask me about:\n- Shipping and delivery\n- Returns and refunds\n- Payment methods\n- Order tracking\n- Product recommendations\n- Current promotions\n\nWhat would you like to know?";
     }
 
-    // Default response
     return "I'm here to help! You can ask me about shipping, returns, payments, order tracking, or finding products. What would you like to know?";
   };
 
-  // Fetch user and initial messages
+  // Fetch user and set welcome message
   useEffect(() => {
     const fetchUserAndMessages = async () => {
       try {
@@ -135,7 +115,7 @@ const ChatButton: React.FC = () => {
               user.email?.split("@")[0] || "there"
             }! How can I help you today? Try asking about shipping, returns, or search for products (e.g., 'find football boots').`,
             created_at: new Date().toISOString(),
-            profiles: { email: "bot@kickoffgear.com" },
+            email: botEmail,
           },
         ]);
       } catch (err: unknown) {
@@ -158,23 +138,20 @@ const ChatButton: React.FC = () => {
     if (!newMessage.trim() || !user) return;
 
     try {
-      // Add user message to UI immediately
+      // Add user message to UI
       const userMessage: Message = {
         id: Date.now(),
         user_id: user.id,
         content: newMessage.trim(),
         created_at: new Date().toISOString(),
-        profiles: { email: user.email || "User" },
+        email: user.email || "User",
       };
 
       setMessages((prev) => [...prev, userMessage]);
 
       // Generate bot response
       setIsBotTyping(true);
-
-      // Simulate thinking time
       await new Promise((resolve) => setTimeout(resolve, 500));
-
       const botResponse = await generateBotResponse(newMessage.trim());
 
       // Add bot response to UI
@@ -183,7 +160,7 @@ const ChatButton: React.FC = () => {
         user_id: botUserId,
         content: botResponse,
         created_at: new Date().toISOString(),
-        profiles: { email: "bot@kickoffgear.com" },
+        email: botEmail,
       };
 
       setMessages((prev) => [...prev, botMessage]);
@@ -271,7 +248,7 @@ const ChatButton: React.FC = () => {
                   }`}
                 >
                   <div className="block text-xs text-gray-500 mb-1">
-                    {message.profiles?.email || "Unknown"} (
+                    {message.email || "Unknown"} (
                     {new Date(message.created_at).toLocaleTimeString()})
                   </div>
                   {message.user_id === botUserId ? (

@@ -29,16 +29,27 @@ export default function AuthPage() {
     e.preventDefault();
     setError(null);
 
+    // Basic validation
+    if (!email.includes("@") || !email.includes(".")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
+
     try {
       if (isSignUp) {
-        // Sign up
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
         });
         if (error) throw error;
-
-        // Insert user details into profiles table
+        if (data.user && data.user.identities?.length === 0) {
+          setError("Email already in use.");
+          return;
+        }
         if (data.user) {
           const { error: profileError } = await supabase
             .from("profiles")
@@ -49,11 +60,10 @@ export default function AuthPage() {
               },
             ]);
           if (profileError) throw profileError;
+          setError("Please check your email to confirm your account.");
+          router.push("/check-email"); // Adjust based on your app
         }
-
-        router.push("/home");
       } else {
-        // Sign in
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -62,7 +72,8 @@ export default function AuthPage() {
         router.push("/");
       }
     } catch (err: any) {
-      setError(err.message);
+      console.error("Auth error:", err);
+      setError(err.message || "An error occurred during authentication.");
     }
   };
 
